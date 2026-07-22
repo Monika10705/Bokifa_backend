@@ -86,7 +86,18 @@ const loginUser = async (req, res) => {
   }
 };
 
+const getProfile = (req, res) => {
+
+    res.status(200).json({
+        success: true,
+        message: "Profile fetched successfully",
+        user: req.user
+    });
+
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  getProfile,
 };
