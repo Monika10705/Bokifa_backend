@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import api from "../services/api";
+
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 
 function Register() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -20,10 +24,44 @@ function Register() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(formData);
+        if (
+            !formData.name ||
+            !formData.email ||
+            !formData.password ||
+            !formData.confirmPassword
+        ) {
+            return toast.error("Please fill all fields");
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            return toast.error("Passwords do not match");
+        }
+
+        try {
+            const response = await api.post("/auth/register", {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+            });
+
+            toast.success(response.data.message);
+
+            setFormData({
+                name: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+            });
+
+            navigate("/login");
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Registration failed"
+            );
+        }
     };
 
     return (

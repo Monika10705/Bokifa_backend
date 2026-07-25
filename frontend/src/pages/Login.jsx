@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import api from "../services/api";
+
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 
 function Login() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         role: "user",
         email: "",
@@ -19,10 +23,31 @@ function Login() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(formData);
+        if (!formData.email || !formData.password) {
+            return toast.error("Please fill all fields");
+        }
+
+        try {
+            const response = await api.post("/auth/login", formData);
+
+            toast.success(response.data.message);
+
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("role", response.data.data.role);
+
+            if (response.data.data.role === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/");
+            }
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Login failed"
+            );
+        }
     };
 
     return (
