@@ -1,5 +1,17 @@
+import AnnouncementBar from "../components/AnnouncementBar";
+import Header from "../components/Header";
+import HeroSection from "../components/HeroSection";
+import Navbar from "../components/Navbar";
+
 function Home() {
-  return <h1>Home Page</h1>;
+  return (
+    <>
+      <AnnouncementBar />
+      <Header />
+      <Navbar />
+      <HeroSection />
+    </>
+  );
 }
 
 export default Home;
