@@ -7,38 +7,49 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
-    description: {
+    author: {
       type: String,
       required: true,
       trim: true,
+      default: "Ap Bokifa",
     },
-
+    description: {
+      type: String,
+      default: "",
+    },
     price: {
       type: Number,
       required: true,
     },
-
-    category: {
+    currency: {
       type: String,
-      required: true,
-      trim: true,
+      default: "EUR",
     },
-
     image: {
-      type: String,
+      type: String, // e.g. "/images/book-posters/bo_pro_15.jpg" or a full CDN URL
       required: true,
     },
-
-    stock: {
+    rating: {
       type: Number,
-      required: true,
+      min: 0,
+      max: 5,
       default: 0,
     },
+    category: {
+      type: [String],
+      default: "general", // e.g. "highlights", "bestseller", "new-release"
+      index: true,
+    },
+    stock: {
+      type: Number,
+      default: 0,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false, // use this to control "This week's highlights"
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Product", productSchema);

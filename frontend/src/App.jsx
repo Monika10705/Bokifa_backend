@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/products/:id" element={<ProductDetails />} />
                 </Routes>
 
                 <ToastContainer
