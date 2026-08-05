@@ -37,7 +37,7 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: [String],
-      default: "general", // e.g. "highlights", "bestseller", "new-release"
+      default: ["General"],
       index: true,
     },
     stock: {
@@ -49,7 +49,7 @@ const productSchema = new mongoose.Schema(
       default: false, // use this to control "This week's highlights"
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Product", productSchema);

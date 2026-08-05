@@ -8,6 +8,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
+import Shop from "./pages/Shop";
+
 
 function App() {
     return (
@@ -26,6 +28,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/products/:id" element={<ProductDetails />} />
+                    <Route path="/shop" element={<Shop />} />
                 </Routes>
 
                 <ToastContainer
