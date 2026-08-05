@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { ProductCard } from "./HighlightsSection";
+import { useCart } from "../context/CartContext";
 
 function ProductGrid({ products, loading }) {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   if (loading) {
     return (
@@ -62,7 +64,7 @@ function ProductGrid({ products, loading }) {
             onToggleWishlist={() => {}}
             onQuickView={() => {}}
             onCompare={() => {}}
-            onAddToCart={() => {}}
+            onAddToCart={(p) => addToCart(p)}
           />
         </div>
 

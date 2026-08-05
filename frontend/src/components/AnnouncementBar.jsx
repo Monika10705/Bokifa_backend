@@ -6,7 +6,7 @@ function AnnouncementBar() {
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2.5">
               <button
                 aria-label="Previous announcement"
-                className="hover:opacity-70 transition-opacity"
+                className="cursor-pointer hover:opacity-70 transition-opacity"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -16,7 +16,7 @@ function AnnouncementBar() {
               </p>
               <button
                 aria-label="Next announcement"
-                className="hover:opacity-70 transition-opacity"
+                className="cursor-pointer hover:opacity-70 transition-opacity"
               >
                 <ChevronRight size={16} />
               </button>

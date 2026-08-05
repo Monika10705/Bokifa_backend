@@ -23,7 +23,7 @@ function HeroSection() {
             BOOKS
           </h1>
           <p className="text-gray-700 mb-7">Save up to 15% on new releases.</p>
-          <button className="inline-flex items-center gap-2 bg-white text-gray-900 font-semibold rounded-full px-6 py-3 w-fit shadow-sm hover:shadow-md transition-shadow">
+          <button className="cursor-pointer inline-flex items-center gap-2 bg-white text-gray-900 font-semibold rounded-full px-6 py-3 w-fit shadow-sm hover:shadow-md transition-shadow">
             Discover Now
             <ChevronRight size={16} />
           </button>
@@ -53,7 +53,7 @@ function HeroSection() {
             key={i}
             onClick={() => setActiveSlide(i)}
             aria-label={`Go to slide ${i + 1}`}
-            className={`h-2 rounded-full transition-all ${
+            className={`cursor-pointer h-2 rounded-full transition-all ${
               activeSlide === i ? "w-6 bg-[#0d3b2e]" : "w-2 bg-white/70"
             }`}
           />

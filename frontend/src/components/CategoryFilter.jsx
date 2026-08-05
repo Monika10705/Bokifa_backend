@@ -16,7 +16,7 @@ function CategoryFilter({
 
           <button
             onClick={() => setSelectedCategory("All")}
-            className={`flex justify-between w-full text-left transition ${
+            className={`cursor-pointer flex justify-between w-full text-left transition ${
               selectedCategory === "All"
                 ? "text-[#1a6b3a] font-semibold"
                 : "text-gray-600 hover:text-[#1a6b3a]"
@@ -34,7 +34,7 @@ function CategoryFilter({
 
             <button
               onClick={() => setSelectedCategory(category)}
-              className={`flex justify-between w-full text-left transition ${
+              className={`cursor-pointer flex justify-between w-full text-left transition ${
                 selectedCategory === category
                   ? "text-[#1a6b3a] font-semibold"
                   : "text-gray-600 hover:text-[#1a6b3a]"

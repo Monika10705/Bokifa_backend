@@ -157,7 +157,7 @@ function Shop() {
                                 setSortBy(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="border rounded-md px-4 py-2 outline-none"
+                            className="cursor-pointer border rounded-md px-4 py-2 outline-none"
                         >
                             <option value="default">Default</option>
                             <option value="priceLow">Price: Low to High</option>
@@ -182,7 +182,7 @@ function Shop() {
                             <button
                                 key={index}
                                 onClick={() => setCurrentPage(index + 1)}
-                                className={`w-10 h-10 rounded-full border transition ${currentPage === index + 1
+                                className={`cursor-pointer w-10 h-10 rounded-full border transition ${currentPage === index + 1
                                     ? "bg-[#1a6b3a] text-white"
                                     : "hover:bg-gray-100"
                                     }`}

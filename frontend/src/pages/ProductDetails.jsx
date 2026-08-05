@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Star } from "lucide-react";
 import Button from "../components/Button";
+import { useCart } from "../context/CartContext";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function ProductDetails() {
   const { id } = useParams();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -106,7 +108,7 @@ function ProductDetails() {
 
             <button
               onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-              className="border px-4 py-2 rounded"
+              className="cursor-pointer border px-4 py-2 rounded"
             >
               -
             </button>
@@ -117,7 +119,7 @@ function ProductDetails() {
 
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="border px-4 py-2 rounded"
+              className="cursor-pointer border px-4 py-2 rounded"
             >
               +
             </button>
@@ -127,7 +129,7 @@ function ProductDetails() {
           {/* Buttons */}
           <div className="flex gap-4">
 
-            <Button className="w-auto px-10">
+            <Button className="w-auto px-10" onClick={() => addToCart({ id: product._id, title: product.title, author: product.author, image: product.image, price: product.price }, quantity)}>
               Add To Cart
             </Button>
 

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Heart, Eye, Repeat2, ChevronRight, X, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 const API_BASE =
   import.meta?.env?.VITE_API_URL ||
@@ -42,7 +43,7 @@ function QuickViewModal({ product, onClose, onAddToCart }) {
         <button
           onClick={onClose}
           aria-label="Close quick view"
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          className="cursor-pointer absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
         >
           <X size={18} />
         </button>
@@ -66,7 +67,7 @@ function QuickViewModal({ product, onClose, onAddToCart }) {
             onAddToCart(product);
             onClose();
           }}
-          className="w-full bg-[#1a6b3a] text-white font-bold text-sm py-3 rounded-lg hover:bg-[#145530] transition-colors"
+          className="cursor-pointer w-full bg-[#1a6b3a] text-white font-bold text-sm py-3 rounded-lg hover:bg-[#145530] transition-colors"
         >
           + Add To Cart
         </button>
@@ -91,7 +92,7 @@ export function ProductCard({
       className="cursor-pointer"
     >
       <div
-        className="group relative min-w-[227px] w-[227px] shrink-0 rounded-xl border border-gray-100 p-3 cursor-pointer transition-shadow duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:bg-white"
+        className="group relative rounded-xl border border-gray-100 p-3 cursor-pointer transition-shadow duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:bg-white"
       >
         {/* Image + hover icons + rating */}
         <div className="relative rounded-[10px]">
@@ -106,8 +107,8 @@ export function ProductCard({
           <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5 z-10">
             <button
               aria-label="Toggle wishlist"
-              onClick={() => onToggleWishlist(product)}
-              className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-colors ${isWishlisted
+              onClick={(e) => { e.stopPropagation(); onToggleWishlist(product); }}
+              className={`cursor-pointer w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-colors ${isWishlisted
                 ? "bg-[#1a6b3a] text-white"
                 : "bg-white text-gray-600 hover:bg-[#1a6b3a] hover:text-white"
                 }`}
@@ -117,16 +118,16 @@ export function ProductCard({
 
             <button
               aria-label="Quick view"
-              onClick={() => onQuickView(product)}
-              className="w-9 h-9 rounded-full bg-white text-gray-600 shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[#1a6b3a] hover:text-white"
+              onClick={(e) => { e.stopPropagation(); onQuickView(product); }}
+              className="cursor-pointer w-9 h-9 rounded-full bg-white text-gray-600 shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[#1a6b3a] hover:text-white"
             >
               <Eye size={16} />
             </button>
 
             <button
               aria-label="Compare"
-              onClick={() => onCompare(product)}
-              className="w-9 h-9 rounded-full bg-white text-gray-600 shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[#1a6b3a] hover:text-white"
+              onClick={(e) => { e.stopPropagation(); onCompare(product); }}
+              className="cursor-pointer w-9 h-9 rounded-full bg-white text-gray-600 shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[#1a6b3a] hover:text-white"
             >
               <Repeat2 size={16} />
             </button>
@@ -151,8 +152,8 @@ export function ProductCard({
         <p className="text-center text-[#1a6b3a] font-bold mt-1">{product.price}</p>
 
         <button
-          onClick={() => onAddToCart(product)}
-          className="w-full bg-[#1a6b3a] text-white text-sm font-bold py-3 rounded-lg mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#145530]"
+          onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+          className="cursor-pointer w-full bg-[#1a6b3a] text-white text-sm font-bold py-2.5 rounded-full mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#145530]"
         >
           + Add To Cart
         </button>
@@ -161,7 +162,9 @@ export function ProductCard({
   );
 }
 
-export default function HighlightsSection({ onAddToCart, onBrowseAll }) {
+export default function HighlightsSection() {
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -241,9 +244,7 @@ export default function HighlightsSection({ onAddToCart, onBrowseAll }) {
   }
 
   function handleAddToCart(product) {
-    onAddToCart?.(product);
-    setToast(`Added "${product.title}" to cart`);
-    setTimeout(() => setToast(null), 2000);
+    addToCart(product);
   }
 
   function handleCompare(product) {
@@ -260,8 +261,8 @@ export default function HighlightsSection({ onAddToCart, onBrowseAll }) {
             This week's highlights
           </h2>
           <button
-            onClick={onBrowseAll}
-            className="flex items-center gap-1.5 border border-gray-200 rounded-full px-5 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
+            onClick={() => navigate("/shop")}
+            className="cursor-pointer flex items-center gap-1.5 border border-gray-200 rounded-full px-5 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
           >
             Browse All <ChevronRight size={16} />
           </button>
@@ -270,12 +271,12 @@ export default function HighlightsSection({ onAddToCart, onBrowseAll }) {
         {error ? (
           <p className="text-center text-red-500 py-10">{error}</p>
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {loading
               ? Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="min-w-[227px] w-[227px] shrink-0 rounded-xl border border-gray-100 p-3 animate-pulse"
+                  className="rounded-xl border border-gray-100 p-3 animate-pulse"
                 >
                   <div className="w-full aspect-[3/4] bg-gray-200 rounded-[10px]" />
                   <div className="h-4 bg-gray-200 rounded mt-5 mx-auto w-3/4" />
@@ -284,7 +285,7 @@ export default function HighlightsSection({ onAddToCart, onBrowseAll }) {
                 </div>
               ))
               : products.length > 0 ? (
-                products.map((product) => (
+                products.slice(0, 6).map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
