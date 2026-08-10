@@ -102,7 +102,7 @@ function Shop() {
     );
 
     return (
-        <section className="max-w-[1450px] mx-auto px-6 py-10">
+        <section className="max-w-[1300px] mx-auto px-6 py-10">
 
             {/* Breadcrumb */}
 

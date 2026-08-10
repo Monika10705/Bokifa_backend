@@ -33,9 +33,8 @@ function Cart() {
   }
 
   return (
-    <section className="max-w-6xl mx-auto px-5 py-12">
+    <section className="max-w-[1300px] mx-auto px-5 py-12">
 
-      {/* Page title */}
       <div className="flex items-center justify-between mb-10">
         <div>
           <h1 className="text-4xl font-serif">Shopping Cart</h1>
@@ -79,7 +78,6 @@ function Cart() {
                   />
                   <div className="min-w-0">
                     <h3
-                    
                       onClick={() => navigate(`/products/${item.id}`)}
                       className="font-semibold text-sm leading-snug line-clamp-2 cursor-pointer hover:text-[#1a6b3a] transition-colors"
                     >

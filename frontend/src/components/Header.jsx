@@ -7,9 +7,11 @@ import {
 } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 function Header() {
   const { totalItems, setIsCartOpen } = useCart();
+  const { wishlist, setIsWishlistOpen } = useWishlist();
   return (
     <div className="bg-white border-b border-gray-100">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-8 px-4 py-4">
@@ -47,10 +49,10 @@ function Header() {
                   <User size={20} />
                 </button>
     
-                <button aria-label="Wishlist" className="cursor-pointer relative hover:text-[#0d3b2e]">
+                <button onClick={() => setIsWishlistOpen(true)} aria-label="Wishlist" className="cursor-pointer relative hover:text-[#0d3b2e]">
                   <Heart size={20} />
                   <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
-                    0
+                    {wishlist.length}
                   </span>
                 </button>
     

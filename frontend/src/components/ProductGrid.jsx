@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { ProductCard } from "./HighlightsSection";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 function ProductGrid({ products, loading }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
 
   if (loading) {
     return (
@@ -60,8 +62,8 @@ function ProductGrid({ products, loading }) {
               rating: product.rating,
               price: `€${Number(product.price).toFixed(2)}`,
             }}
-            isWishlisted={false}
-            onToggleWishlist={() => {}}
+            isWishlisted={isWishlisted(product._id)}
+            onToggleWishlist={toggleWishlist}
             onQuickView={() => {}}
             onCompare={() => {}}
             onAddToCart={(p) => addToCart(p)}

@@ -1,14 +1,13 @@
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Eye, Repeat2, ChevronRight, X, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 const API_BASE =
   import.meta?.env?.VITE_API_URL ||
   "http://localhost:5000";
 
-
-// Formats a raw number (261.95) into "€261,95" style display text
 function formatPrice(price, currency = "EUR") {
   const symbol = currency === "EUR" ? "€" : currency;
   return `${symbol}${price.toFixed(2).replace(".", ",")}`;
@@ -164,15 +163,12 @@ export function ProductCard({
 
 export default function HighlightsSection() {
   const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [wishlist, setWishlist] = useState(new Set());
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [toast, setToast] = useState(null);
-
-  const wishlistIds = useMemo(() => wishlist, [wishlist]);
 
   useEffect(() => {
     let cancelled = false;
@@ -231,26 +227,11 @@ export default function HighlightsSection() {
     };
   }, []);
 
-  function toggleWishlist(product) {
-    setWishlist((prev) => {
-      const next = new Set(prev);
-      if (next.has(product.id)) {
-        next.delete(product.id);
-      } else {
-        next.add(product.id);
-      }
-      return next;
-    });
-  }
-
   function handleAddToCart(product) {
     addToCart(product);
   }
 
-  function handleCompare(product) {
-    setToast(`Added "${product.title}" to compare`);
-    setTimeout(() => setToast(null), 2000);
-  }
+  function handleCompare(product) {}
 
   return (
     <section className="py-12 relative">
@@ -289,7 +270,7 @@ export default function HighlightsSection() {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    isWishlisted={wishlistIds.has(product.id)}
+                    isWishlisted={isWishlisted(product.id)}
                     onToggleWishlist={toggleWishlist}
                     onQuickView={setQuickViewProduct}
                     onCompare={handleCompare}
@@ -311,12 +292,6 @@ export default function HighlightsSection() {
         onClose={() => setQuickViewProduct(null)}
         onAddToCart={handleAddToCart}
       />
-
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-5 py-3 rounded-full shadow-lg z-50">
-          {toast}
-        </div>
-      )}
     </section>
   );
 }

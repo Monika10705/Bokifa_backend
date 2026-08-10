@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import CartSidebar from "./components/CartSidebar";
+import WishlistSidebar from "./components/WishlistSidebar";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -12,6 +13,7 @@ import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
+import Wishlist from "./pages/Wishlist";
 
 
 function App() {
@@ -33,9 +35,11 @@ function App() {
                     <Route path="/products/:id" element={<Layout><ProductDetails /></Layout>} />
                     <Route path="/shop" element={<Layout><Shop /></Layout>} />
                     <Route path="/cart" element={<Layout><Cart /></Layout>} />
+                    <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
                 </Routes>
 
                 <CartSidebar />
+                <WishlistSidebar />
 
                 <ToastContainer
                     position="top-right"
