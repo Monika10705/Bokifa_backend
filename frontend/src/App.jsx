@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 
 
@@ -29,12 +30,20 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedRoute adminOnly>
+                                <AdminDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/products/:id" element={<Layout><ProductDetails /></Layout>} />
                     <Route path="/shop" element={<Layout><Shop /></Layout>} />
                     <Route path="/cart" element={<Layout><Cart /></Layout>} />
+                    <Route path="/checkout" element={<Checkout />} />
                     <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
                 </Routes>
 

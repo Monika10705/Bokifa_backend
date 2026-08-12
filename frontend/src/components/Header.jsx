@@ -4,14 +4,24 @@ import {
   User,
   Search,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 
 function Header() {
   const { totalItems, setIsCartOpen } = useCart();
   const { wishlist, setIsWishlistOpen } = useWishlist();
+  const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
+  }
   return (
     <div className="bg-white border-b border-gray-100">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-8 px-4 py-4">
@@ -48,6 +58,13 @@ function Header() {
                 <button aria-label="Account" className="cursor-pointer hover:text-[#0d3b2e]">
                   <User size={20} />
                 </button>
+
+                {isLoggedIn && (
+                  <button onClick={handleLogout} aria-label="Logout" className="cursor-pointer flex items-center gap-1.5 text-sm text-red-400 hover:text-red-600 transition-colors">
+                    <LogOut size={18} />
+                    <span className="hidden lg:inline">Logout</span>
+                  </button>
+                )}
     
                 <button onClick={() => setIsWishlistOpen(true)} aria-label="Wishlist" className="cursor-pointer relative hover:text-[#0d3b2e]">
                   <Heart size={20} />
