@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "./Button";
 
 function UserForm({ initial, onSubmit, onClose, isEdit }) {
   const [form, setForm] = useState(initial);
@@ -55,19 +56,12 @@ function UserForm({ initial, onSubmit, onClose, isEdit }) {
       )}
 
       <div className="flex gap-2 pt-1">
-        <button
-          type="submit"
-          className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-        >
+        <Button type="submit" className="flex-1 !py-2 text-sm font-medium">
           Save
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex-1 border border-gray-300 py-2 rounded-lg text-sm hover:bg-gray-50"
-        >
+        </Button>
+        <Button type="button" onClick={onClose} className="flex-1 !py-2 !bg-white border border-gray-300 !text-gray-700 text-sm hover:!bg-gray-50">
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
