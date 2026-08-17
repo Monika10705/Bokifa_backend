@@ -15,6 +15,7 @@ import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
+import Orders from "./pages/Orders";
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
                     <Route path="/cart" element={<Layout><Cart /></Layout>} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
+                    <Route path="/orders" element={<Layout><Orders /></Layout>} />
                 </Routes>
 
                 <CartSidebar />

@@ -1,14 +1,45 @@
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Tag } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useCart } from "../context/CartContext";
+import api from "../services/api";
 
 function Cart() {
   const { cart, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
+  const [placing, setPlacing] = useState(false);
 
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const shipping = totalPrice > 50 ? 0 : 4.99;
   const grandTotal = totalPrice + shipping;
+
+  async function handlePlaceOrder() {
+    try {
+      setPlacing(true);
+      const token = localStorage.getItem("token");
+      const items = cart.map((item) => ({
+        productId: item.id,
+        title: item.title,
+        author: item.author,
+        image: item.image,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+      await api.post(
+        "/orders",
+        { items, subtotal: totalPrice, shipping, total: grandTotal },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      clearCart();
+      toast.success("Order placed successfully!");
+      navigate("/orders");
+    } catch (e) {
+      toast.error(e.response?.data?.message || "Failed to place order");
+    } finally {
+      setPlacing(false);
+    }
+  }
 
   function fmt(num) {
     return num.toFixed(2).replace(".", ",");
@@ -182,10 +213,11 @@ function Cart() {
             </div>
 
             <button
-              onClick={() => navigate("/checkout")}
-              className="cursor-pointer w-full mt-5 bg-[#1a6b3a] text-white font-bold py-3.5 rounded-xl hover:bg-[#145530] transition-colors"
+              onClick={handlePlaceOrder}
+              disabled={placing}
+              className="cursor-pointer w-full mt-5 bg-[#1a6b3a] text-white font-bold py-3.5 rounded-xl hover:bg-[#145530] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Proceed to Checkout
+              {placing ? "Placing Order..." : "Place Order"}
             </button>
 
             <button

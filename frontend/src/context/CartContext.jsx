@@ -8,7 +8,9 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState(() => {
     try {
       const stored = localStorage.getItem("cart");
-      return stored ? JSON.parse(stored) : [];
+      const parsed = stored ? JSON.parse(stored) : [];
+      // Sanitize: ensure every item has a numeric quantity
+      return parsed.map((item) => ({ ...item, quantity: Number(item.quantity) || 1 }));
     } catch {
       return [];
     }
@@ -23,7 +25,7 @@ export function CartProvider({ children }) {
               ? { ...item, quantity: item.quantity + quantity }
               : item
           )
-        : [...prev, { ...product, price: parsePrice(product.price), quantity }];
+        : [...prev, { ...product, price: parsePrice(product.price), quantity: Number(quantity) || 1 }];
       localStorage.setItem("cart", JSON.stringify(next));
       return next;
     });
@@ -54,8 +56,8 @@ export function CartProvider({ children }) {
 
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
 
   return (
     <CartContext.Provider

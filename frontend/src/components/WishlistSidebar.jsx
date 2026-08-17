@@ -88,7 +88,7 @@ export default function WishlistSidebar() {
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <button
-                      onClick={() => { addToCart(item); removeFromWishlist(item.id); }}
+                      onClick={() => addToCart(item)}
                       className="cursor-pointer flex-1 flex items-center justify-center gap-1.5 bg-[#1a6b3a] text-white text-xs font-semibold py-2 rounded-lg hover:bg-[#145530] transition-colors"
                     >
                       <ShoppingBag size={13} /> Add to Cart
