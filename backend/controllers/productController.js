@@ -2,42 +2,56 @@ const Product = require("../models/Product");
 const Category = require("../models/Category");
 
 const addProduct = async (req, res) => {
-    try {
-        const { title, description, price, category, image, stock, isActive, isFeatured } = req.body;
+  try {
+    const {
+      title,
+      description,
+      price,
+      category,
+      image,
+      stock,
+      isActive,
+      isFeatured,
+    } = req.body;
 
-        const product = await Product.create({
-            title,
-            description,
-            price,
-            category,
-            image,
-            stock,
-            isActive: isActive !== undefined ? isActive : true,
-            isFeatured: isFeatured || false,
-        });
+    const product = await Product.create({
+      title,
+      description,
+      price,
+      category,
+      image,
+      stock,
+      isActive: isActive !== undefined ? isActive : true,
+      isFeatured: isFeatured || false,
+    });
 
-        res.status(201).json({
-            success: true,
-            message: "Product added successfully",
-            product,
-        }); 
-        
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
-    }
-}
+    res.status(201).json({
+      success: true,
+      message: "Product added successfully",
+      product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 const getAllProducts = async (req, res) => {
   try {
     const allCategoryNames = await Category.find().distinct("name");
-    const activeCategoryNames = await Category.find({ isActive: { $ne: false } }).distinct("name");
-    const products = await Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 });
+    const activeCategoryNames = await Category.find({
+      isActive: { $ne: false },
+    }).distinct("name");
+    const products = await Product.find({ isActive: { $ne: false } }).sort({
+      createdAt: -1,
+    });
 
     const visibleProducts = products.filter((product) => {
-      const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+      const categories = Array.isArray(product.category)
+        ? product.category
+        : [product.category].filter(Boolean);
 
       if (!categories.length) return true;
       if (!allCategoryNames.length) return true;
@@ -74,8 +88,12 @@ const getProductById = async (req, res) => {
     }
 
     const allCategoryNames = await Category.find().distinct("name");
-    const activeCategoryNames = await Category.find({ isActive: { $ne: false } }).distinct("name");
-    const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+    const activeCategoryNames = await Category.find({
+      isActive: { $ne: false },
+    }).distinct("name");
+    const categories = Array.isArray(product.category)
+      ? product.category
+      : [product.category].filter(Boolean);
     const hasActiveCategory =
       !categories.length ||
       !allCategoryNames.length ||
@@ -105,14 +123,10 @@ const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedProduct) {
       return res.status(404).json({
@@ -160,9 +174,9 @@ const deleteProduct = async (req, res) => {
 };
 
 module.exports = {
-    addProduct,
-    getAllProducts,
-    getProductById,
-    updateProduct,
-    deleteProduct
-}
+  addProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+};

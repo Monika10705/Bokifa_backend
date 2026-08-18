@@ -55,6 +55,15 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ name: 1 });
@@ -194,6 +203,7 @@ const addProductToCategory = async (req, res) => {
 module.exports = {
   getAllUsers,
   getAllOrders, updateOrderStatus,
+  getAllProducts,
   getAllCategories, createCategory, updateCategory, deleteCategory,
   syncCategoriesFromProducts,
   getProductsByCategory, addProductToCategory,

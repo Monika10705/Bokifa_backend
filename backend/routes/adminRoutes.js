@@ -4,13 +4,14 @@ const adminMiddleware = require("../middleware/adminMiddleware");
 const {
   getAllUsers,
   getAllOrders, updateOrderStatus,
+  getAllProducts,
   getAllCategories, createCategory, updateCategory, deleteCategory,
   syncCategoriesFromProducts,
   getProductsByCategory, addProductToCategory,
 } = require("../controllers/adminController");
 
 const {
-  addProduct, getAllProducts, updateProduct, deleteProduct,
+  addProduct, updateProduct, deleteProduct,
 } = require("../controllers/productController");
 
 const router = express.Router();
