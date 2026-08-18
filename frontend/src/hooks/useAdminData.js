@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 
+// Builds the Authorization header from the token stored in localStorage
 const authHeader = () => ({
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 });
@@ -9,11 +10,13 @@ export function useAdminData() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
 
   const clearError = () => setError("");
 
-  // ── Fetch ──────────────────────────────────────────────
+  // ── Fetch all data on mount ────────────────────────────────────────────────
+
   const fetchProducts = useCallback(async () => {
     try {
       const res = await api.get("/admin/products", authHeader());
@@ -25,8 +28,8 @@ export function useAdminData() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      // Sync first so any product categories not yet in the Category
-      // collection get created, then the response returns the full list.
+      // Sync first: creates Category documents for any product category
+      // strings that don't have one yet, then returns the full list.
       const res = await api.post("/admin/categories/sync", {}, authHeader());
       setCategories(res.data.categories);
     } catch {
@@ -43,13 +46,24 @@ export function useAdminData() {
     }
   }, []);
 
+  const fetchOrders = useCallback(async () => {
+    try {
+      const res = await api.get("/admin/orders", authHeader());
+      setOrders(res.data.orders);
+    } catch {
+      setError("Failed to load orders.");
+    }
+  }, []);
+
   useEffect(() => {
     fetchProducts();
     fetchCategories();
     fetchUsers();
-  }, [fetchProducts, fetchCategories, fetchUsers]);
+    fetchOrders();
+  }, [fetchProducts, fetchCategories, fetchUsers, fetchOrders]);
 
-  // ── Products ───────────────────────────────────────────
+  // ── Products ───────────────────────────────────────────────────────────────
+
   const saveProduct = async (form) => {
     try {
       const payload = {
@@ -62,11 +76,13 @@ export function useAdminData() {
             ? form.category.split(",").map((c) => c.trim())
             : form.category,
       };
+
       if (form._id) {
         await api.put(`/admin/products/${form._id}`, payload, authHeader());
       } else {
         await api.post("/admin/products", payload, authHeader());
       }
+
       fetchProducts();
     } catch (e) {
       setError(e.response?.data?.message || "Error saving product.");
@@ -84,7 +100,8 @@ export function useAdminData() {
     }
   };
 
-  // ── Categories ─────────────────────────────────────────
+  // ── Categories ─────────────────────────────────────────────────────────────
+
   const saveCategory = async (form) => {
     try {
       if (form._id) {
@@ -92,7 +109,7 @@ export function useAdminData() {
       } else {
         await api.post("/admin/categories", form, authHeader());
       }
-      // Re-sync so the list stays consistent
+      // Re-sync so the list stays consistent after save
       const res = await api.post("/admin/categories/sync", {}, authHeader());
       setCategories(res.data.categories);
     } catch (e) {
@@ -111,10 +128,14 @@ export function useAdminData() {
     }
   };
 
-  // ── Category <-> Products ────────────────────────────────
+  // ── Category <-> Products ──────────────────────────────────────────────────
+
   const fetchCategoryProducts = async (categoryId) => {
     try {
-      const res = await api.get(`/admin/categories/${categoryId}/products`, authHeader());
+      const res = await api.get(
+        `/admin/categories/${categoryId}/products`,
+        authHeader(),
+      );
       return res.data.products;
     } catch {
       setError("Failed to load category products.");
@@ -124,45 +145,52 @@ export function useAdminData() {
 
   const addProductToCategory = async (categoryId, form) => {
     try {
-      await api.post(`/admin/categories/${categoryId}/products`, form, authHeader());
+      await api.post(
+        `/admin/categories/${categoryId}/products`,
+        form,
+        authHeader(),
+      );
       fetchProducts();
     } catch (e) {
-      setError(e.response?.data?.message || "Error adding product to category.");
+      setError(
+        e.response?.data?.message || "Error adding product to category.",
+      );
       throw e;
     }
   };
 
-  // ── Users ──────────────────────────────────────────────
-  const saveUser = async (form) => {
+  // ── Orders ─────────────────────────────────────────────────────────────────
+
+  // Updates the status of an order (e.g. pending → shipped)
+  const updateOrderStatus = async (orderId, status) => {
     try {
-      if (form._id) {
-        await api.put(`/admin/users/${form._id}`, form, authHeader());
-      } else {
-        await api.post("/admin/users", form, authHeader());
-      }
-      fetchUsers();
+      const res = await api.put(
+        `/admin/orders/${orderId}/status`,
+        { status },
+        authHeader(),
+      );
+      // Update just the one order in state instead of re-fetching everything
+      setOrders((prev) =>
+        prev.map((o) => (o._id === orderId ? res.data.order : o)),
+      );
     } catch (e) {
-      setError(e.response?.data?.message || "Error saving user.");
-      throw e;
-    }
-  };
-
-  const deleteUser = async (id) => {
-    if (!window.confirm("Delete this user?")) return;
-    try {
-      await api.delete(`/admin/users/${id}`, authHeader());
-      fetchUsers();
-    } catch {
-      setError("Failed to delete user.");
+      setError(e.response?.data?.message || "Failed to update order status.");
     }
   };
 
   return {
-    products, categories, users,
-    error, clearError,
-    saveProduct, deleteProduct,
-    saveCategory, deleteCategory,
-    fetchCategoryProducts, addProductToCategory,
-    saveUser, deleteUser,
+    products,
+    categories,
+    users,
+    orders,
+    error,
+    clearError,
+    saveProduct,
+    deleteProduct,
+    saveCategory,
+    deleteCategory,
+    fetchCategoryProducts,
+    addProductToCategory,
+    updateOrderStatus,
   };
 }

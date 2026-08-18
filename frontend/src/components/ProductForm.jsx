@@ -132,15 +132,27 @@ function ProductForm({ initial, onSubmit, onClose, categories = [], lockedCatego
         className={inputClass}
       />
 
-      <label className="flex items-center gap-2 text-sm select-none cursor-pointer">
-        <input
-          type="checkbox"
-          name="isFeatured"
-          checked={form.isFeatured}
-          onChange={handleChange}
-        />
-        <span>Featured product</span>
-      </label>
+      <div className="flex flex-col gap-2 pt-1">
+        <label className="flex items-center gap-2 text-sm select-none cursor-pointer">
+          <input
+            type="checkbox"
+            name="isActive"
+            checked={Boolean(form.isActive ?? true)}
+            onChange={handleChange}
+          />
+          <span>Active product</span>
+        </label>
+
+        <label className="flex items-center gap-2 text-sm select-none cursor-pointer">
+          <input
+            type="checkbox"
+            name="isFeatured"
+            checked={Boolean(form.isFeatured)}
+            onChange={handleChange}
+          />
+          <span>Featured product</span>
+        </label>
+      </div>
 
       <div className="flex gap-2 pt-1">
         <Button type="submit" className="flex-1 !py-2 text-sm font-medium">

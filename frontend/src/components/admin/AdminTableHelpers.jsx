@@ -1,4 +1,25 @@
-import Button from "../../components/Button";
+import Button from "../Button";
+
+// Color mapping for each order status
+const STATUS_STYLES = {
+  pending:    "bg-yellow-50 text-yellow-700",
+  processing: "bg-blue-50 text-blue-700",
+  shipped:    "bg-purple-50 text-purple-700",
+  delivered:  "bg-green-50 text-green-700",
+  cancelled:  "bg-red-50 text-red-600",
+};
+
+export function StatusBadge({ status }) {
+  return (
+    <span
+      className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
+        STATUS_STYLES[status] || "bg-gray-100 text-gray-600"
+      }`}
+    >
+      {status}
+    </span>
+  );
+}
 
 export function Section({ title, count, onAdd, children }) {
   return (

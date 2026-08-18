@@ -44,6 +44,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     isFeatured: {
       type: Boolean,
       default: false, // use this to control "This week's highlights"

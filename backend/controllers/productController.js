@@ -1,8 +1,9 @@
 const Product = require("../models/Product");
+const Category = require("../models/Category");
 
 const addProduct = async (req, res) => {
     try {
-        const { title, description, price, category, image, stock } = req.body;
+        const { title, description, price, category, image, stock, isActive, isFeatured } = req.body;
 
         const product = await Product.create({
             title,
@@ -11,6 +12,8 @@ const addProduct = async (req, res) => {
             category,
             image,
             stock,
+            isActive: isActive !== undefined ? isActive : true,
+            isFeatured: isFeatured || false,
         });
 
         res.status(201).json({
@@ -29,13 +32,25 @@ const addProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const allCategoryNames = await Category.find().distinct("name");
+    const activeCategoryNames = await Category.find({ isActive: { $ne: false } }).distinct("name");
+    const products = await Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 });
+
+    const visibleProducts = products.filter((product) => {
+      const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+
+      if (!categories.length) return true;
+      if (!allCategoryNames.length) return true;
+      if (!activeCategoryNames.length) return false;
+
+      return categories.some((name) => activeCategoryNames.includes(name));
+    });
 
     res.status(200).json({
       success: true,
       message: "Products fetched successfully",
-      count: products.length,
-      products,
+      count: visibleProducts.length,
+      products: visibleProducts,
     });
   } catch (error) {
     res.status(500).json({
@@ -51,7 +66,22 @@ const getProductById = async (req, res) => {
 
     const product = await Product.findById(id);
 
-    if (!product) {
+    if (!product || product.isActive === false) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const allCategoryNames = await Category.find().distinct("name");
+    const activeCategoryNames = await Category.find({ isActive: { $ne: false } }).distinct("name");
+    const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+    const hasActiveCategory =
+      !categories.length ||
+      !allCategoryNames.length ||
+      categories.some((name) => activeCategoryNames.includes(name));
+
+    if (!hasActiveCategory) {
       return res.status(404).json({
         success: false,
         message: "Product not found",

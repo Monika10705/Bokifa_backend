@@ -54,6 +54,9 @@ function CategoriesTable({ categories, onAdd, onEdit, onDelete, fetchCategoryPro
                     <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-mono">
                       {category.slug}
                     </span>
+                    <span className={`text-[11px] px-2 py-0.5 rounded font-medium ${category.isActive !== false ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>
+                      {category.isActive !== false ? "Active" : "Inactive"}
+                    </span>
                   </div>
                   {category.description && (
                     <p className="text-xs text-gray-400 mt-0.5 truncate max-w-md">

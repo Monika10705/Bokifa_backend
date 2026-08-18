@@ -1,58 +1,55 @@
 const User = require("../models/User");
 const Category = require("../models/Category");
-const bcrypt = require("bcrypt");
+const Order = require("../models/Order");
 
+// ── Users (read-only) ──────────────────────────────────────────────────────
+
+// Get all users — admin can only view, not modify
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
     res.status(200).json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-const createUser = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    const existing = await User.findOne({ email });
-    if (existing)
-      return res.status(400).json({ success: false, message: "User already exists" });
+// ── Orders (admin view + status update) ───────────────────────────────────
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword });
-    const { password: _, ...userData } = user.toObject();
-    res.status(201).json({ success: true, user: userData });
+// Get all orders from all users, with user details populated
+const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("user", "name email")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, orders });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-const updateUser = async (req, res) => {
+// Update the status of a specific order
+const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email } = req.body;
-    const user = await User.findByIdAndUpdate(id, { name, email }, { new: true }).select("-password");
+    const { status } = req.body;
 
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, message: "User not found" 
-      });
+    const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status value" });
     }
 
-    res.status(200).json({ success: true, user });
-    
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    ).populate("user", "name email");
 
-const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findByIdAndDelete(id);
-    if (!user)
-      return res.status(404).json({ success: false, message: "User not found" });
-    res.status(200).json({ success: true, message: "User deleted successfully" });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    res.status(200).json({ success: true, order });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -81,7 +78,14 @@ const syncCategoriesFromProducts = async (req, res) => {
     const ops = uniqueNames.map((name) => ({
       updateOne: {
         filter: { slug: name.toLowerCase().replace(/\s+/g, "-") },
-        update: { $setOnInsert: { name, slug: name.toLowerCase().replace(/\s+/g, "-"), description: "" } },
+        update: {
+          $setOnInsert: {
+            name,
+            slug: name.toLowerCase().replace(/\s+/g, "-"),
+            description: "",
+            isActive: true,
+          },
+        },
         upsert: true,
       },
     }));
@@ -97,12 +101,17 @@ const syncCategoriesFromProducts = async (req, res) => {
 
 const createCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, isActive } = req.body;
     const slug = name.toLowerCase().replace(/\s+/g, "-");
     const existing = await Category.findOne({ slug });
     if (existing)
       return res.status(400).json({ success: false, message: "Category already exists" });
-    const category = await Category.create({ name, slug, description });
+    const category = await Category.create({
+      name,
+      slug,
+      description,
+      isActive: isActive !== undefined ? isActive : true,
+    });
     res.status(201).json({ success: true, category });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -112,11 +121,11 @@ const createCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, isActive } = req.body;
     const slug = name.toLowerCase().replace(/\s+/g, "-");
     const category = await Category.findByIdAndUpdate(
       id,
-      { name, slug, description },
+      { name, slug, description, isActive: isActive !== undefined ? isActive : true },
       { new: true, runValidators: true }
     );
     if (!category)
@@ -162,7 +171,7 @@ const addProductToCategory = async (req, res) => {
     if (!category)
       return res.status(404).json({ success: false, message: "Category not found" });
 
-    const { title, author, description, price, image, stock, isFeatured } = req.body;
+    const { title, author, description, price, image, stock, isFeatured, isActive } = req.body;
 
     const product = await Product.create({
       title,
@@ -172,6 +181,7 @@ const addProductToCategory = async (req, res) => {
       image,
       stock: Number(stock) || 0,
       isFeatured: isFeatured || false,
+      isActive: isActive !== undefined ? isActive : true,
       category: [category.name],
     });
 
@@ -182,7 +192,8 @@ const addProductToCategory = async (req, res) => {
 };
 
 module.exports = {
-  getAllUsers, createUser, updateUser, deleteUser,
+  getAllUsers,
+  getAllOrders, updateOrderStatus,
   getAllCategories, createCategory, updateCategory, deleteCategory,
   syncCategoriesFromProducts,
   getProductsByCategory, addProductToCategory,
