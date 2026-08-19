@@ -130,7 +130,7 @@ export function useAdminData() {
 
   // ── Category <-> Products ──────────────────────────────────────────────────
 
-  const fetchCategoryProducts = async (categoryId) => {
+  const fetchCategoryProducts = useCallback(async (categoryId) => {
     try {
       const res = await api.get(
         `/admin/categories/${categoryId}/products`,
@@ -141,7 +141,7 @@ export function useAdminData() {
       setError("Failed to load category products.");
       return [];
     }
-  };
+  }, []);
 
   const addProductToCategory = async (categoryId, form) => {
     try {

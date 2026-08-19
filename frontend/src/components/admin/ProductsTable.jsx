@@ -1,8 +1,49 @@
+import { useMemo, useState } from "react";
 import { Section, EmptyRow, RowActions } from "./AdminTableHelpers";
 
 function ProductsTable({ products, onAdd, onEdit, onDelete }) {
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredProducts = useMemo(() => {
+    if (statusFilter === "active") {
+      return products.filter((product) => product.isActive !== false);
+    }
+
+    if (statusFilter === "inactive") {
+      return products.filter((product) => product.isActive === false);
+    }
+
+    return products;
+  }, [products, statusFilter]);
+
   return (
     <Section title="Products" count={products.length} onAdd={onAdd}>
+      <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
+        <p className="text-xs font-medium text-gray-500">Filter Products</p>
+
+        <div className="flex gap-2">
+          {[
+            { value: "all", label: "All" },
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ].map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => setStatusFilter(filter.value)}
+              aria-pressed={statusFilter === filter.value}
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition ${
+                statusFilter === filter.value
+                  ? "border-gray-800 bg-gray-800 text-white"
+                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[600px]">
           <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
@@ -19,9 +60,11 @@ function ProductsTable({ products, onAdd, onEdit, onDelete }) {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {products.length === 0 ? (
-              <EmptyRow cols={7} label="No products yet" />
+              <EmptyRow cols={8} label="No products yet" />
+            ) : filteredProducts.length === 0 ? (
+              <EmptyRow cols={8} label={`No ${statusFilter} products found`} />
             ) : (
-              products.map((product) => (
+              filteredProducts.map((product) => (
                 <tr key={product._id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <img
