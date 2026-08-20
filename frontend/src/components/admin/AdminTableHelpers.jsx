@@ -21,19 +21,22 @@ export function StatusBadge({ status }) {
   );
 }
 
-export function Section({ title, count, onAdd, children }) {
+export function Section({ title, count, onAdd, headerAction, children }) {
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center gap-4 mb-4">
         <h3 className="font-semibold text-gray-700">
           {title} ({count})
         </h3>
-        <Button
-          onClick={onAdd}
-          className="!w-auto px-4 !py-2 text-sm !font-medium"
-        >
-          + Add {title.slice(0, -1)}
-        </Button>
+        <div className="flex items-center gap-3">
+          {headerAction}
+          <Button
+            onClick={onAdd}
+            className="!w-auto px-4 !py-2 text-sm !font-medium"
+          >
+            + Add {title.slice(0, -1)}
+          </Button>
+        </div>
       </div>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {children}

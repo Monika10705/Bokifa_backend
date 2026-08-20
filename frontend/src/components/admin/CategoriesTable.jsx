@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "../Button";
 import CategoryProductsPanel from "./CategoryProductsPanel";
 
 function CategoriesTable({ categories, onAdd, onEdit, onDelete, fetchCategoryProducts, onAddProductToCategory }) {
   const [expandedId, setExpandedId] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredCategories = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return categories;
+
+    return categories.filter((category) =>
+      [category.name, category.slug, category.description]
+        .some((value) => String(value || "").toLowerCase().includes(query)),
+    );
+  }, [categories, search]);
 
   const toggleExpand = (id) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -12,11 +23,23 @@ function CategoriesTable({ categories, onAdd, onEdit, onDelete, fetchCategoryPro
   return (
     <div>
       {/* Section header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center gap-4 mb-4">
         <h3 className="font-semibold text-gray-700">Categories ({categories.length})</h3>
-        <Button onClick={onAdd} className="!w-auto px-4 !py-2 text-sm !font-medium">
-          + Add Category
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="relative w-48 sm:w-64">
+            <input
+              type="search"
+              placeholder="Search categories..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          </div>
+          <Button onClick={onAdd} className="!w-auto px-4 !py-2 text-sm !font-medium">
+            + Add Category
+          </Button>
+        </div>
       </div>
 
       {/* Empty state */}
@@ -28,7 +51,12 @@ function CategoriesTable({ categories, onAdd, onEdit, onDelete, fetchCategoryPro
 
       {/* Category cards */}
       <div className="space-y-3">
-        {categories.map((category) => {
+        {filteredCategories.length === 0 && categories.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm px-6 py-10 text-center text-gray-400 text-sm">
+            No categories found
+          </div>
+        )}
+        {filteredCategories.map((category) => {
           const isExpanded = expandedId === category._id;
 
           return (

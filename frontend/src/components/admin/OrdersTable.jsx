@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { EmptyRow, StatusBadge } from "./AdminTableHelpers";
 
 const ALL_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
 function OrdersTable({ orders, onUpdateStatus }) {
   const [expandedId, setExpandedId] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredOrders = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return orders;
+
+    return orders.filter((order) =>
+      [order._id, order.user?.name, order.user?.email, order.status]
+        .some((value) => String(value || "").toLowerCase().includes(query)),
+    );
+  }, [orders, search]);
 
   function toggleExpand(id) {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -22,8 +33,18 @@ function OrdersTable({ orders, onUpdateStatus }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center gap-4 mb-4">
         <h3 className="font-semibold text-gray-700">Orders ({orders.length})</h3>
+        <div className="relative w-48 sm:w-64">
+          <input
+            type="search"
+            placeholder="Search orders..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        </div>
       </div>
 
       {/* Mobile card list */}
@@ -32,8 +53,12 @@ function OrdersTable({ orders, onUpdateStatus }) {
           <div className="bg-white rounded-xl shadow-sm px-6 py-10 text-center text-gray-400 text-sm">
             No orders yet
           </div>
+        ) : filteredOrders.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm px-6 py-10 text-center text-gray-400 text-sm">
+            No orders found
+          </div>
         ) : (
-          orders.map((order) => {
+          filteredOrders.map((order) => {
             const isExpanded = expandedId === order._id;
             return (
               <div key={order._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -114,8 +139,10 @@ function OrdersTable({ orders, onUpdateStatus }) {
             <tbody className="divide-y divide-gray-100">
               {orders.length === 0 ? (
                 <EmptyRow cols={7} label="No orders yet" />
+              ) : filteredOrders.length === 0 ? (
+                <EmptyRow cols={7} label="No orders found" />
               ) : (
-                orders.map((order) => {
+                filteredOrders.map((order) => {
                   const isExpanded = expandedId === order._id;
                   return (
                     <>

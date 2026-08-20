@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Section, EmptyRow, RowActions } from "./AdminTableHelpers";
 
-function ProductsTable({ products, onAdd, onEdit, onDelete }) {
+function ProductsTable({ products, search, onSearch, onAdd, onEdit, onDelete }) {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const filteredProducts = useMemo(() => {
@@ -17,7 +17,23 @@ function ProductsTable({ products, onAdd, onEdit, onDelete }) {
   }, [products, statusFilter]);
 
   return (
-    <Section title="Products" count={products.length} onAdd={onAdd}>
+    <Section
+      title="Products"
+      count={products.length}
+      onAdd={onAdd}
+      headerAction={(
+        <div className="relative w-48 sm:w-64">
+          <input
+            type="search"
+            placeholder="Search products..."
+            value={search}
+            onChange={(event) => onSearch(event.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        </div>
+      )}
+    >
       <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
         <p className="text-xs font-medium text-gray-500">Filter Products</p>
 

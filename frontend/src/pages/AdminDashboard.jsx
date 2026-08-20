@@ -15,16 +15,17 @@ import CategoryForm from "../components/CategoryForm";
 import Button from "../components/Button";
 
 // Default empty states for the add forms
-const EMPTY_PRODUCT  = { title: "", author: "", description: "", price: "", category: "", image: "", stock: "", rating: 0, isFeatured: false, isActive: true };
+const EMPTY_PRODUCT = { title: "", author: "", description: "", price: "", category: "", image: "", stock: "", rating: 0, isFeatured: false, isActive: true };
 const EMPTY_CATEGORY = { name: "", description: "", isActive: true };
 
 function AdminDashboard() {
   const navigate = useNavigate();
 
-  const [activeTab,    setActiveTab]    = useState("products");
-  const [sidebarOpen,  setSidebarOpen]  = useState(true);
+  const [activeTab, setActiveTab] = useState("products");
+  const [productSearch, setProductSearch] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [modal,        setModal]        = useState(null); // { type, data, ...extras }
+  const [modal, setModal] = useState(null); // { type, data, ...extras }
 
   const {
     products, categories, users, orders,
@@ -41,7 +42,7 @@ function AdminDashboard() {
     navigate("/login");
   }
 
-  const openModal  = (type, data = null, extra = {}) => setModal({ type, data, ...extra });
+  const openModal = (type, data = null, extra = {}) => setModal({ type, data, ...extra });
   const closeModal = () => setModal(null);
 
   // Close modal only after a successful save
@@ -67,11 +68,19 @@ function AdminDashboard() {
 
   // Badge counts shown next to each sidebar nav item
   const counts = {
-    products:   products.length,
+    products: products.length,
     categories: categories.length,
-    orders:     orders.length,
-    users:      users.length,
+    orders: orders.length,
+    users: users.length,
   };
+
+  const filteredProducts = products.filter((product) => {
+    const query = productSearch.trim().toLowerCase();
+    if (!query) return true;
+
+    return [product.title, product.author]
+      .some((value) => String(value || "").toLowerCase().includes(query));
+  });
 
   return (
     <div className="min-h-screen flex bg-gray-50 relative">
@@ -108,14 +117,16 @@ function AdminDashboard() {
           )}
 
           {/* Products tab */}
+          {/* Products tab */}
           {activeTab === "products" && (
             <ProductsTable
-              products={products}
+              products={filteredProducts}
+              search={productSearch}
+              onSearch={setProductSearch}
               onAdd={() => openModal("product")}
               onEdit={(product) =>
                 openModal("product", {
                   ...product,
-                  // Join array to string so the form input shows "Books, Fiction"
                   category: Array.isArray(product.category)
                     ? product.category.join(", ")
                     : product.category,
@@ -135,7 +146,7 @@ function AdminDashboard() {
               fetchCategoryProducts={fetchCategoryProducts}
               onAddProductToCategory={(category) =>
                 openModal("product-in-category", null, {
-                  categoryId:   category._id,
+                  categoryId: category._id,
                   categoryName: category.name,
                 })
               }
