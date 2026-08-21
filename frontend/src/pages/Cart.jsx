@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import api from "../services/api";
 
 function Cart() {
-  const { cart, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, totalPrice } = useCart();
   const navigate = useNavigate();
   const [placing, setPlacing] = useState(false);
 
@@ -17,7 +17,10 @@ function Cart() {
   async function handlePlaceOrder() {
     try {
       setPlacing(true);
+
       const token = localStorage.getItem("token");
+
+      // Prepare cart items for the MongoDB order
       const items = cart.map((item) => ({
         productId: item.id,
         title: item.title,
@@ -26,17 +29,102 @@ function Cart() {
         price: item.price,
         quantity: item.quantity,
       }));
-      await api.post(
-        "/orders",
-        { items, subtotal: totalPrice, shipping, total: grandTotal },
-        { headers: { Authorization: `Bearer ${token}` } }
+
+      // 1. Create Razorpay order on backend
+      const response = await api.post(
+        "/orders/create-payment-order",
+        { total: grandTotal },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      clearCart();
-      toast.success("Order placed successfully!");
-      navigate("/orders");
+
+      const razorpayOrder = response.data.order;
+
+      // 2. Open Razorpay Checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "Bokifa",
+        description: "Book Order",
+        order_id: razorpayOrder.id,
+
+        handler: async function (paymentResponse) {
+          try {
+            console.log("Payment successful:", paymentResponse);
+
+            // 3. Verify payment on YOUR backend
+            const verifyResponse = await api.post(
+              "/orders/verify-payment",
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+
+                items,
+                subtotal: totalPrice,
+                shipping,
+                total: grandTotal,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            console.log("Verification response:", verifyResponse.data);
+
+            // 4. Only after successful verification:
+            clearCart();
+
+            toast.success("Payment successful! Order placed successfully.");
+
+            navigate("/orders");
+          } catch (error) {
+            console.error("Payment verification failed:", error);
+
+            toast.error(
+              error.response?.data?.message ||
+              "Payment succeeded, but order verification failed."
+            );
+          } finally {
+            setPlacing(false);
+          }
+        },
+
+        prefill: {
+          name: "",
+          email: "",
+          contact: "",
+        },
+
+        theme: {
+          color: "#1a6b3a",
+        },
+
+        modal: {
+          ondismiss: function () {
+            setPlacing(false);
+            toast.error("Payment cancelled.");
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.open();
     } catch (e) {
-      toast.error(e.response?.data?.message || "Failed to place order");
-    } finally {
+      console.error("Payment initialization failed:", e);
+
+      toast.error(
+        e.response?.data?.message ||
+        "Failed to create payment order"
+      );
+
       setPlacing(false);
     }
   }
@@ -161,7 +249,7 @@ function Cart() {
           {/* Clear cart */}
           <div className="flex justify-end pt-2">
             <button
-              onClick={clearCart}
+              // onClick={clearCart}
               className="cursor-pointer text-xs text-gray-400 hover:text-red-500 transition-colors underline underline-offset-2"
             >
               Clear cart

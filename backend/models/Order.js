@@ -13,16 +13,42 @@ const orderSchema = new mongoose.Schema(
         quantity: Number,
       },
     ],
-    subtotal: { type: Number, required: true },
-    shipping: { type: Number, default: 0 },
-    total: { type: Number, required: true },
+    subtotal: {
+      type: Number,
+      required: true,
+    },
+    shipping: {
+      type: Number,
+      default: 0,
+    },
+    total: {
+      type: Number,
+      required: true,
+    },
+    razorpayOrderId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    razorpayPaymentId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
+    },
     status: {
       type: String,
       enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Order", orderSchema);

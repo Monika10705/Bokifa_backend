@@ -17,7 +17,6 @@ import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Orders from "./pages/Orders";
 
-
 function App() {
     return (
         <BrowserRouter>
