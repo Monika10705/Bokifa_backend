@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import api from "../services/api";
 
 function Cart() {
-  const { cart, removeFromCart, updateQuantity, totalPrice } = useCart();
+  const { cart, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const [placing, setPlacing] = useState(false);
 
@@ -53,11 +53,13 @@ function Cart() {
         order_id: razorpayOrder.id,
 
         handler: async function (paymentResponse) {
-          try {
-            console.log("Payment successful:", paymentResponse);
+          console.log("Payment successful:", paymentResponse);
 
-            // 3. Verify payment on YOUR backend
-            const verifyResponse = await api.post(
+          // Only this part is responsible for payment verification
+          let verifyResponse;
+
+          try {
+            verifyResponse = await api.post(
               "/orders/verify-payment",
               {
                 razorpay_order_id: paymentResponse.razorpay_order_id,
@@ -75,25 +77,47 @@ function Cart() {
                 },
               }
             );
-
-            console.log("Verification response:", verifyResponse.data);
-
-            // 4. Only after successful verification:
-            clearCart();
-
-            toast.success("Payment successful! Order placed successfully.");
-
-            navigate("/orders");
           } catch (error) {
-            console.error("Payment verification failed:", error);
+            console.error("Payment verification request failed:", error);
+            console.error("Backend response:", error.response?.data);
 
             toast.error(
               error.response?.data?.message ||
               "Payment succeeded, but order verification failed."
             );
-          } finally {
+
             setPlacing(false);
+            return;
           }
+
+          console.log("Verification response:", verifyResponse.data);
+
+          // Backend confirmed payment + order creation
+          if (verifyResponse.data.success) {
+            console.log("Order successfully created.");
+
+            // Stop loading first
+            setPlacing(false);
+
+            // Clear cart
+            clearCart();
+
+            // Show success message
+            toast.success("Order placed successfully!");
+
+            // Go to order history
+            navigate("/orders");
+
+            return;
+          }
+
+          // Backend returned success:false
+          setPlacing(false);
+
+          toast.error(
+            verifyResponse.data.message ||
+            "Order verification failed."
+          );
         },
 
         prefill: {
@@ -249,7 +273,7 @@ function Cart() {
           {/* Clear cart */}
           <div className="flex justify-end pt-2">
             <button
-              // onClick={clearCart}
+              onClick={clearCart}
               className="cursor-pointer text-xs text-gray-400 hover:text-red-500 transition-colors underline underline-offset-2"
             >
               Clear cart
