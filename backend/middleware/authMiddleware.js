@@ -19,10 +19,10 @@ const authMiddleware = async (req, res, next) => {
     const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
-        return res.status(404).json({
-            success: false,
-            message: "User not found",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     req.user = user;
@@ -30,8 +30,8 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     return res.status(401).json({
-        success: false,
-        message: "Invalid token",
+      success: false,
+      message: "Invalid token",
     });
   }
 };

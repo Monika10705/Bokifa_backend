@@ -16,6 +16,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
 
 function App() {
     return (
@@ -46,6 +47,14 @@ function App() {
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
                     <Route path="/orders" element={<Layout><Orders /></Layout>} />
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute>
+                                <Layout><Profile /></Layout>
+                            </ProtectedRoute>
+                        }
+                    />
                 </Routes>
 
                 <CartSidebar />
