@@ -116,6 +116,14 @@ function Login() {
                             required
                         />
                     </div>
+                    <div className="flex justify-end mt-2">
+                        <Link
+                            to="/forgot-password"
+                            className="text-green-600 font-medium hover:underline"
+                        >
+                            Forgot Password?
+                        </Link>
+                    </div>
 
                     <Button
                         type="submit"

@@ -8,6 +8,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
+    "nodemailer": "^9.0.5",
     "razor": "^1.1.1",
     "razorpay": "^2.9.8"
   },
