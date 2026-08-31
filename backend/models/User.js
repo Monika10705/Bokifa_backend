@@ -32,6 +32,20 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    emailChangeOtp: {
+      type: String,
+      default: null,
+    },
+
+    emailChangeOtpExpire: {
+      type: Date,
+      default: null,
+    },
+
+    pendingEmail: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

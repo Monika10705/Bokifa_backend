@@ -10,6 +10,9 @@ function Profile() {
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -72,13 +75,21 @@ function Profile() {
   };
 
   const cancelEditing = () => {
-    setFormData({ name: profile?.name || "", email: profile?.email || "" });
+    setFormData({
+      name: profile?.name || "",
+      email: profile?.email || "",
+    });
+
     setEditing(false);
+    setOtpStep(false);
+    setOtp("");
     setError("");
+    setSuccess("");
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
     setSuccess("");
 
@@ -87,21 +98,120 @@ function Profile() {
       return;
     }
 
+    const emailChanged =
+      formData.email.trim().toLowerCase() !==
+      profile.email.trim().toLowerCase();
+
     try {
       setSaving(true);
+
       const token = localStorage.getItem("token");
-      const response = await api.put("/auth/profile", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+
+      // Email changed → send OTP to new email
+      if (emailChanged) {
+        const response = await api.post(
+          "/auth/profile/email/send-otp",
+          {
+            email: formData.email.trim(),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setOtpStep(true);
+          setSuccess(
+            "OTP sent to your new email address. Please check your inbox."
+          );
+        }
+
+        return;
+      }
+
+      // Email unchanged → update name normally
+      const response = await api.put(
+        "/auth/profile",
+        {
+          name: formData.name.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setProfile(response.data.user);
-      setFormData({ name: response.data.user.name, email: response.data.user.email });
+
+      setFormData({
+        name: response.data.user.name,
+        email: response.data.user.email,
+      });
+
       setEditing(false);
-      setSuccess(response.data.message || "Profile updated successfully.");
+
+      setSuccess(
+        response.data.message || "Profile updated successfully."
+      );
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Unable to update your profile. Please try again.");
+      setError(
+        requestError.response?.data?.message ||
+        "Unable to update your profile. Please try again."
+      );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      setError("Please enter the OTP.");
+      return;
+    }
+
+    try {
+      setOtpLoading(true);
+      setError("");
+      setSuccess("");
+
+      const token = localStorage.getItem("token");
+
+      const response = await api.post(
+        "/auth/profile/email/verify-otp",
+        {
+          otp: otp.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setProfile(response.data.user);
+
+        setFormData({
+          name: response.data.user.name,
+          email: response.data.user.email,
+        });
+
+        setOtp("");
+        setOtpStep(false);
+        setEditing(false);
+
+        setSuccess("Profile updated successfully.");
+      }
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+        "Invalid or expired OTP."
+      );
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -156,38 +266,77 @@ function Profile() {
                 className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none transition focus:border-[#0d3b2e] focus:ring-2 focus:ring-[#0d3b2e]/15"
               />
             </div>
+            {otpStep && (
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                <p className="text-sm text-emerald-800 mb-3">
+                  We've sent a 6-digit OTP to{" "}
+                  <strong>{formData.email}</strong>.
+                </p>
+
+                <label
+                  htmlFor="otp"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Enter OTP
+                </label>
+
+                <input
+                  id="otp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) =>
+                    setOtp(e.target.value.replace(/\D/g, ""))
+                  }
+                  placeholder="Enter 6-digit OTP"
+                  className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none transition focus:border-[#0d3b2e] focus:ring-2 focus:ring-[#0d3b2e]/15"
+                />
+
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={otpLoading || otp.length !== 6}
+                  className="mt-3 w-full rounded-lg bg-[#0d3b2e] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0a2f24] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {otpLoading
+                    ? "Verifying..."
+                    : "Verify OTP & Update Email"}
+                </button>
+              </div>
+            )}
             {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
             <div className="flex justify-end gap-3 pt-1">
-              <button type="button" onClick={cancelEditing} disabled={saving} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-60">Cancel</button>
-              <button type="submit" disabled={saving} className="rounded-lg bg-[#0d3b2e] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0a2f24] disabled:cursor-not-allowed disabled:opacity-60">
+              <button type="button" onClick={cancelEditing} disabled={saving || otpStep} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-60">Cancel</button>
+              <button type="submit" disabled={saving || otpStep} className="rounded-lg bg-[#0d3b2e] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0a2f24] disabled:cursor-not-allowed disabled:opacity-60">
                 {saving ? "Saving..." : "Save changes"}
               </button>
             </div>
           </form>
         ) : (
           <>
-        <dl className="mt-6 space-y-5">
-          <div className="flex gap-3 items-center">
-            <UserRound className="mt-0.5 shrink-0 text-[#0d3b2e]" size={20} />
-            <div>
-              <dt className="text-sm text-gray-500">Full name</dt>
-              <dd className="mt-0.5 font-medium text-gray-900">{name}</dd>
+            <dl className="mt-6 space-y-5">
+              <div className="flex gap-3 items-center">
+                <UserRound className="mt-0.5 shrink-0 text-[#0d3b2e]" size={20} />
+                <div>
+                  <dt className="text-sm text-gray-500">Full name</dt>
+                  <dd className="mt-0.5 font-medium text-gray-900">{name}</dd>
+                </div>
+              </div>
+              <div className="flex gap-3 items-center">
+                <Mail className="mt-0.5 shrink-0 text-[#0d3b2e]" size={20} />
+                <div>
+                  <dt className="text-sm text-gray-500">Email address</dt>
+                  <dd className="mt-0.5 font-medium text-gray-900 break-all">{profile?.email || "Not available"}</dd>
+                </div>
+              </div>
+            </dl>
+            <div className="mt-7 flex justify-end border-t border-gray-100 pt-6">
+              <button onClick={() => { setSuccess(""); setError(""); setEditing(true); }} className="inline-flex items-center gap-2 rounded-lg border border-[#0d3b2e] px-4 py-2 text-sm font-medium text-[#0d3b2e] transition hover:bg-[#0d3b2e] hover:text-white">
+                <Pencil size={16} />
+                Edit profile
+              </button>
             </div>
-          </div>
-          <div className="flex gap-3 items-center">
-            <Mail className="mt-0.5 shrink-0 text-[#0d3b2e]" size={20} />
-            <div>
-              <dt className="text-sm text-gray-500">Email address</dt>
-              <dd className="mt-0.5 font-medium text-gray-900 break-all">{profile?.email || "Not available"}</dd>
-            </div>
-          </div>
-        </dl>
-        <div className="mt-7 flex justify-end border-t border-gray-100 pt-6">
-          <button onClick={() => { setSuccess(""); setError(""); setEditing(true); }} className="inline-flex items-center gap-2 rounded-lg border border-[#0d3b2e] px-4 py-2 text-sm font-medium text-[#0d3b2e] transition hover:bg-[#0d3b2e] hover:text-white">
-            <Pencil size={16} />
-            Edit profile
-          </button>
-        </div>
           </>
         )}
       </section>
