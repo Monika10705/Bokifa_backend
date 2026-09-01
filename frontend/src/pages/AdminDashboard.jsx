@@ -116,7 +116,22 @@ function AdminDashboard() {
             </div>
           )}
 
-          {/* Products tab */}
+          {/* Categories tab */}
+          {activeTab === "categories" && (
+            <CategoriesTable
+              categories={categories}
+              onAdd={() => openModal("category")}
+              onEdit={(category) => openModal("category", category)}
+              onDelete={deleteCategory}
+              fetchCategoryProducts={fetchCategoryProducts}
+              onAddProductToCategory={(category) =>
+                openModal("product-in-category", null, {
+                  categoryId: category._id,
+                  categoryName: category.name,
+                })
+              }
+            />
+          )}
           {/* Products tab */}
           {activeTab === "products" && (
             <ProductsTable
@@ -136,22 +151,7 @@ function AdminDashboard() {
             />
           )}
 
-          {/* Categories tab */}
-          {activeTab === "categories" && (
-            <CategoriesTable
-              categories={categories}
-              onAdd={() => openModal("category")}
-              onEdit={(category) => openModal("category", category)}
-              onDelete={deleteCategory}
-              fetchCategoryProducts={fetchCategoryProducts}
-              onAddProductToCategory={(category) =>
-                openModal("product-in-category", null, {
-                  categoryId: category._id,
-                  categoryName: category.name,
-                })
-              }
-            />
-          )}
+
 
           {/* Orders tab */}
           {activeTab === "orders" && (
@@ -170,7 +170,18 @@ function AdminDashboard() {
       </div>
 
       {/* ── Modals ────────────────────────────────────────────────────────── */}
-
+      {modal?.type === "category" && (
+        <Modal
+          title={modal.data ? "Edit Category" : "Add Category"}
+          onClose={closeModal}
+        >
+          <CategoryForm
+            initial={modal.data || EMPTY_CATEGORY}
+            onSubmit={handleSaveCategory}
+            onClose={closeModal}
+          />
+        </Modal>
+      )}
       {/* Add / Edit product */}
       {modal?.type === "product" && (
         <Modal
@@ -200,18 +211,7 @@ function AdminDashboard() {
       )}
 
       {/* Add / Edit category */}
-      {modal?.type === "category" && (
-        <Modal
-          title={modal.data ? "Edit Category" : "Add Category"}
-          onClose={closeModal}
-        >
-          <CategoryForm
-            initial={modal.data || EMPTY_CATEGORY}
-            onSubmit={handleSaveCategory}
-            onClose={closeModal}
-          />
-        </Modal>
-      )}
+
 
     </div>
   );

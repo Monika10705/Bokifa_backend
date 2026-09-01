@@ -26,8 +26,27 @@ const productSchema = new mongoose.Schema(
       default: "EUR",
     },
     image: {
-      type: String, // e.g. "/images/book-posters/bo_pro_15.jpg" or a full CDN URL
+      type: String,
       required: true,
+    },
+    imageFileId: {
+      type: String,
+      default: null,
+    },
+    images: {
+      type: [
+        {
+          url: {
+            type: String,
+            required: true,
+          },
+          fileId: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+      default: [],
     },
     rating: {
       type: Number,
