@@ -91,7 +91,7 @@ function ProductDetails() {
           </div>
 
           <h2 className="text-3xl text-green-700 font-bold mb-5">
-            € {product.price}
+            ₹ {product.price}
           </h2>
 
           <p className="text-gray-600 leading-7 mb-8">

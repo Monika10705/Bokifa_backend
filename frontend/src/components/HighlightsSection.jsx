@@ -9,7 +9,7 @@ const API_BASE =
   "http://localhost:5000";
 
 function formatPrice(price, currency = "EUR") {
-  const symbol = currency === "EUR" ? "€" : currency;
+  const symbol = currency === "EUR" ? "₹" : currency;
   return `${symbol}${price.toFixed(2).replace(".", ",")}`;
 }
 

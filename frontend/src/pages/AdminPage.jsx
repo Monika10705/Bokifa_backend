@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAdminData } from "../hooks/useAdminData";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
+import AdminDashboard from "../components/admin/AdminDashboard";
 import ProductsTable from "../components/admin/ProductsTable";
 import CategoriesTable from "../components/admin/CategoriesTable";
 import OrdersTable from "../components/admin/OrdersTable";
@@ -18,10 +19,10 @@ import Button from "../components/Button";
 const EMPTY_PRODUCT = { title: "", author: "", description: "", price: "", category: "", image: "", stock: "", rating: 0, isFeatured: false, isActive: true };
 const EMPTY_CATEGORY = { name: "", description: "", isActive: true };
 
-function AdminDashboard() {
+function AdminPage() {
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState("products");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [productSearch, setProductSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -103,10 +104,11 @@ function AdminDashboard() {
 
         <main className="flex-1 p-6 overflow-auto">
 
-          {/* Error banner — shows if any API call fails */}
+          {/* Error banner */}
           {error && (
             <div className="flex justify-between mb-4 bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm">
               <span>{error}</span>
+
               <Button
                 onClick={clearError}
                 className="!w-auto !bg-transparent !py-0 !text-red-600 font-bold ml-2"
@@ -114,6 +116,14 @@ function AdminDashboard() {
                 ×
               </Button>
             </div>
+          )}
+
+          {/* Dashboard tab */}
+          {activeTab === "dashboard" && (
+            <AdminDashboard
+              onViewOrders={() => setActiveTab("orders")}
+              onViewUsers={() => setActiveTab("users")}
+            />
           )}
 
           {/* Categories tab */}
@@ -132,6 +142,7 @@ function AdminDashboard() {
               }
             />
           )}
+
           {/* Products tab */}
           {activeTab === "products" && (
             <ProductsTable
@@ -151,8 +162,6 @@ function AdminDashboard() {
             />
           )}
 
-
-
           {/* Orders tab */}
           {activeTab === "orders" && (
             <OrdersTable
@@ -161,7 +170,7 @@ function AdminDashboard() {
             />
           )}
 
-          {/* Users tab — read-only */}
+          {/* Users tab */}
           {activeTab === "users" && (
             <UsersTable users={users} />
           )}
@@ -210,11 +219,8 @@ function AdminDashboard() {
         </Modal>
       )}
 
-      {/* Add / Edit category */}
-
-
     </div>
   );
 }
 
-export default AdminDashboard;
+export default AdminPage;

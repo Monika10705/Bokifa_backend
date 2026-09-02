@@ -75,7 +75,7 @@ function OrdersTable({ orders, onUpdateStatus }) {
                     <p className="text-xs text-gray-400">{formatDate(order.createdAt)}</p>
                   </div>
                   <div className="text-right space-y-1 shrink-0">
-                    <p className="text-sm font-bold text-gray-800">€{formatPrice(order.total)}</p>
+                    <p className="text-sm font-bold text-gray-800">₹{formatPrice(order.total)}</p>
                     <StatusBadge status={order.status} />
                     <p className="text-gray-400 text-xs">{isExpanded ? "▲" : "▼"}</p>
                   </div>
@@ -106,16 +106,16 @@ function OrdersTable({ orders, onUpdateStatus }) {
                             <p className="text-xs text-gray-400">{item.author}</p>
                           </div>
                           <div className="text-right shrink-0">
-                            <p className="text-sm font-bold text-gray-800">€{formatPrice(item.price * item.quantity)}</p>
+                            <p className="text-sm font-bold text-gray-800">₹{formatPrice(item.price * item.quantity)}</p>
                             <p className="text-xs text-gray-400">×{item.quantity}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="text-xs text-right space-y-1 pt-1 border-t border-gray-100">
-                      <p className="text-gray-500">Subtotal: <span className="font-medium text-gray-700">€{formatPrice(order.subtotal)}</span></p>
-                      <p className="text-gray-500">Shipping: <span className={`font-medium ${order.shipping === 0 ? "text-green-600" : "text-gray-700"}`}>{order.shipping === 0 ? "Free" : `€${formatPrice(order.shipping)}`}</span></p>
-                      <p className="font-bold text-gray-800 text-sm">Total: €{formatPrice(order.total)}</p>
+                      <p className="text-gray-500">Subtotal: <span className="font-medium text-gray-700">₹{formatPrice(order.subtotal)}</span></p>
+                      <p className="text-gray-500">Shipping: <span className={`font-medium ${order.shipping === 0 ? "text-green-600" : "text-gray-700"}`}>{order.shipping === 0 ? "Free" : `₹${formatPrice(order.shipping)}`}</span></p>
+                      <p className="font-bold text-gray-800 text-sm">Total: ₹{formatPrice(order.total)}</p>
                     </div>
                   </div>
                 )}
@@ -164,7 +164,7 @@ function OrdersTable({ orders, onUpdateStatus }) {
                         <td className="px-4 py-3 text-gray-600">
                           {order.items.length} {order.items.length === 1 ? "item" : "items"}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-gray-800">€{formatPrice(order.total)}</td>
+                        <td className="px-4 py-3 font-semibold text-gray-800">₹{formatPrice(order.total)}</td>
                         <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                         <td className="px-4 py-3">
                           <select
@@ -192,17 +192,17 @@ function OrdersTable({ orders, onUpdateStatus }) {
                                     <p className="text-xs text-gray-400">{item.author}</p>
                                   </div>
                                   <div className="text-right shrink-0">
-                                    <p className="text-sm font-bold text-gray-800">€{formatPrice(item.price * item.quantity)}</p>
-                                    <p className="text-xs text-gray-400">€{formatPrice(item.price)} × {item.quantity}</p>
+                                    <p className="text-sm font-bold text-gray-800">₹{formatPrice(item.price * item.quantity)}</p>
+                                    <p className="text-xs text-gray-400">₹{formatPrice(item.price)} × {item.quantity}</p>
                                   </div>
                                 </div>
                               ))}
                             </div>
                             <div className="mt-3 flex justify-end">
                               <div className="text-xs space-y-1 text-right">
-                                <p className="text-gray-500">Subtotal: <span className="font-medium text-gray-700">€{formatPrice(order.subtotal)}</span></p>
-                                <p className="text-gray-500">Shipping: <span className={`font-medium ${order.shipping === 0 ? "text-green-600" : "text-gray-700"}`}>{order.shipping === 0 ? "Free" : `€${formatPrice(order.shipping)}`}</span></p>
-                                <p className="text-gray-800 font-bold text-sm">Total: €{formatPrice(order.total)}</p>
+                                <p className="text-gray-500">Subtotal: <span className="font-medium text-gray-700">₹{formatPrice(order.subtotal)}</span></p>
+                                <p className="text-gray-500">Shipping: <span className={`font-medium ${order.shipping === 0 ? "text-green-600" : "text-gray-700"}`}>{order.shipping === 0 ? "Free" : `₹${formatPrice(order.shipping)}`}</span></p>
+                                <p className="text-gray-800 font-bold text-sm">Total: ₹{formatPrice(order.total)}</p>
                               </div>
                             </div>
                           </td>

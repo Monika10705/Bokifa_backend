@@ -95,7 +95,7 @@ function ProductsTable({ products, search, onSearch, onAdd, onEdit, onDelete }) 
                     <p className="sm:hidden text-xs text-gray-400 font-normal mt-0.5">{product.author}</p>
                   </td>
                   <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">{product.author}</td>
-                  <td className="px-4 py-3">€{product.price}</td>
+                  <td className="px-4 py-3">₹{product.price}</td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                       product.stock > 0 ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"

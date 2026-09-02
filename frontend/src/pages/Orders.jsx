@@ -100,7 +100,7 @@ function Orders() {
                   <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${STATUS_STYLES[order.status] || "bg-gray-100 text-gray-600"}`}>
                     {order.status}
                   </span>
-                  <p className="text-base font-bold text-[#1a6b3a]">€{fmt(order.total)}</p>
+                  <p className="text-base font-bold text-[#1a6b3a]">₹{fmt(order.total)}</p>
                   <span className="text-gray-400 text-sm">{isExpanded ? "▲" : "▼"}</span>
                 </div>
               </button>
@@ -120,8 +120,8 @@ function Orders() {
                         <p className="text-xs text-gray-400">{item.author}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-bold text-gray-800">€{fmt(item.price * item.quantity)}</p>
-                        <p className="text-xs text-gray-400">€{fmt(item.price)} × {item.quantity}</p>
+                        <p className="text-sm font-bold text-gray-800">₹{fmt(item.price * item.quantity)}</p>
+                        <p className="text-xs text-gray-400">₹{fmt(item.price)} × {item.quantity}</p>
                       </div>
                     </div>
                   ))}
@@ -130,17 +130,17 @@ function Orders() {
                   <div className="border-t border-gray-100 pt-3 space-y-1.5 text-sm">
                     <div className="flex justify-between text-gray-500">
                       <span>Subtotal</span>
-                      <span>€{fmt(order.subtotal)}</span>
+                      <span>₹{fmt(order.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-gray-500">
                       <span>Shipping</span>
                       <span className={order.shipping === 0 ? "text-[#1a6b3a] font-medium" : ""}>
-                        {order.shipping === 0 ? "Free" : `€${fmt(order.shipping)}`}
+                        {order.shipping === 0 ? "Free" : `₹${fmt(order.shipping)}`}
                       </span>
                     </div>
                     <div className="flex justify-between font-bold text-base pt-1">
                       <span>Total</span>
-                      <span className="text-[#1a6b3a]">€{fmt(order.total)}</span>
+                      <span className="text-[#1a6b3a]">₹{fmt(order.total)}</span>
                     </div>
                   </div>
                 </div>

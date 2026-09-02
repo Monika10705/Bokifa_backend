@@ -1,6 +1,7 @@
 import Button from "../Button";
 
 const NAV_ITEMS = [
+  { key: "dashboard",  label: "Dashboard",  icon: "📊" },
   { key: "categories", label: "Categories", icon: "🏷️" },
   { key: "products",   label: "Products",   icon: "📦" },
   { key: "orders",     label: "Orders",     icon: "🧾" },

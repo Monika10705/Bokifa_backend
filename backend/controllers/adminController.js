@@ -34,19 +34,29 @@ const updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+    const validStatuses = [
+      "pending",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, message: "Invalid status value" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid status value" });
     }
 
     const order = await Order.findByIdAndUpdate(
       id,
       { status },
-      { new: true }
+      { new: true },
     ).populate("user", "name email");
 
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     res.status(200).json({ success: true, order });
@@ -114,7 +124,9 @@ const createCategory = async (req, res) => {
     const slug = name.toLowerCase().replace(/\s+/g, "-");
     const existing = await Category.findOne({ slug });
     if (existing)
-      return res.status(400).json({ success: false, message: "Category already exists" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Category already exists" });
     const category = await Category.create({
       name,
       slug,
@@ -134,11 +146,18 @@ const updateCategory = async (req, res) => {
     const slug = name.toLowerCase().replace(/\s+/g, "-");
     const category = await Category.findByIdAndUpdate(
       id,
-      { name, slug, description, isActive: isActive !== undefined ? isActive : true },
-      { new: true, runValidators: true }
+      {
+        name,
+        slug,
+        description,
+        isActive: isActive !== undefined ? isActive : true,
+      },
+      { new: true, runValidators: true },
     );
     if (!category)
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
     res.status(200).json({ success: true, category });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -150,8 +169,12 @@ const deleteCategory = async (req, res) => {
     const { id } = req.params;
     const category = await Category.findByIdAndDelete(id);
     if (!category)
-      return res.status(404).json({ success: false, message: "Category not found" });
-    res.status(200).json({ success: true, message: "Category deleted successfully" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    res
+      .status(200)
+      .json({ success: true, message: "Category deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -164,7 +187,9 @@ const getProductsByCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category)
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
 
     // Products whose category array contains this category's name
     const products = await Product.find({ category: category.name });
@@ -178,9 +203,20 @@ const addProductToCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category)
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
 
-    const { title, author, description, price, image, stock, isFeatured, isActive } = req.body;
+    const {
+      title,
+      author,
+      description,
+      price,
+      image,
+      stock,
+      isFeatured,
+      isActive,
+    } = req.body;
 
     const product = await Product.create({
       title,
@@ -200,11 +236,178 @@ const addProductToCategory = async (req, res) => {
   }
 };
 
+const getDashboard = async (req, res) => {
+  try {
+    // ── Dashboard statistics ──────────────────────────────────────────────
+
+    const totalUsers = await User.countDocuments();
+
+    const totalProducts = await Product.countDocuments({
+      isActive: { $ne: false },
+    });
+
+    const totalOrders = await Order.countDocuments();
+
+    const revenueResult = await Order.aggregate([
+      {
+        $match: {
+          status: { $ne: "cancelled" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$total" },
+        },
+      },
+    ]);
+
+    const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+
+    // ── Order status counts ───────────────────────────────────────────────
+
+    const orderStatusResult = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const orderStats = {
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+    };
+
+    orderStatusResult.forEach((item) => {
+      if (orderStats[item._id] !== undefined) {
+        orderStats[item._id] = item.count;
+      }
+    });
+
+    // ── Revenue chart data ────────────────────────────────────────────────
+    // Last 7 days
+
+    const tenDaysAgo = new Date();
+
+    tenDaysAgo.setHours(0, 0, 0, 0);
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 9);
+
+    const revenueChartResult = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: tenDaysAgo },
+          status: { $ne: "cancelled" },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
+          },
+          revenue: { $sum: "$total" },
+          orders: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+          "_id.day": 1,
+        },
+      },
+    ]);
+
+    // Create all 7 days, including days with zero sales
+    const revenueChart = [];
+
+    for (let i = 0; i < 10; i++) {
+      const date = new Date(tenDaysAgo);
+
+      date.setDate(tenDaysAgo.getDate() + i);
+
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      const existingDay = revenueChartResult.find(
+        (item) =>
+          item._id.year === year &&
+          item._id.month === month &&
+          item._id.day === day
+      );
+
+      revenueChart.push({
+        date: date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+        revenue: existingDay?.revenue || 0,
+        orders: existingDay?.orders || 0,
+      });
+    }
+
+    // ── Recent orders ─────────────────────────────────────────────────────
+
+    const recentOrders = await Order.find()
+      .populate("user", "name email")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    // ── Recent users ──────────────────────────────────────────────────────
+
+    const recentUsers = await User.find()
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    // ── Dashboard response ────────────────────────────────────────────────
+
+    res.status(200).json({
+      success: true,
+
+      stats: {
+        totalUsers,
+        totalProducts,
+        totalOrders,
+        totalRevenue,
+      },
+
+      orderStats,
+
+      revenueChart,
+
+      recentOrders,
+
+      recentUsers,
+    });
+  } catch (error) {
+    console.error("Dashboard error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
-  getAllOrders, updateOrderStatus,
+  getAllOrders,
+  updateOrderStatus,
   getAllProducts,
-  getAllCategories, createCategory, updateCategory, deleteCategory,
+  getAllCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
   syncCategoriesFromProducts,
-  getProductsByCategory, addProductToCategory,
+  getProductsByCategory,
+  addProductToCategory,
+  getDashboard,
 };

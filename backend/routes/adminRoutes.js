@@ -2,12 +2,18 @@ const express = require("express");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
 const {
+  getDashboard,
   getAllUsers,
-  getAllOrders, updateOrderStatus,
+  getAllOrders,
+  updateOrderStatus,
   getAllProducts,
-  getAllCategories, createCategory, updateCategory, deleteCategory,
+  getAllCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
   syncCategoriesFromProducts,
-  getProductsByCategory, addProductToCategory,
+  getProductsByCategory,
+  addProductToCategory,
 } = require("../controllers/adminController");
 
 const {
@@ -18,6 +24,10 @@ const router = express.Router();
 
 // Every route below requires a valid admin token
 router.use(adminMiddleware);
+
+// ── Dashboard ──────────────────────────────────────────────────────────────
+
+router.get("/dashboard", getDashboard);
 
 // ── Users (read-only) ──────────────────────────────────────────────────────
 router.get("/users", getAllUsers);

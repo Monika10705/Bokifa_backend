@@ -59,7 +59,7 @@ export default function CartSidebar() {
             ) : (
               <div>
                 <p className="text-xs text-gray-500 mb-1.5">
-                  Add <span className="font-semibold text-gray-700">€{fmt(50 - totalPrice)}</span> more for free shipping
+                  Add <span className="font-semibold text-gray-700">₹{fmt(50 - totalPrice)}</span> more for free shipping
                 </p>
                 <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                   <div
@@ -135,7 +135,7 @@ export default function CartSidebar() {
                       {/* Price + remove */}
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-[#1a6b3a]">
-                          €{fmt(item.price * item.quantity)}
+                          ₹{fmt(item.price * item.quantity)}
                         </span>
                         <button
                           onClick={() => removeFromCart(item.id)}
@@ -159,17 +159,17 @@ export default function CartSidebar() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between text-gray-500">
                 <span>Subtotal</span>
-                <span>€{fmt(totalPrice)}</span>
+                <span>₹{fmt(totalPrice)}</span>
               </div>
               <div className="flex justify-between text-gray-500">
                 <span>Shipping</span>
                 <span className={shipping === 0 ? "text-[#1a6b3a] font-semibold" : ""}>
-                  {shipping === 0 ? "Free" : `€${fmt(shipping)}`}
+                  {shipping === 0 ? "Free" : `₹${fmt(shipping)}`}
                 </span>
               </div>
               <div className="flex justify-between font-bold text-base pt-2 border-t border-gray-200">
                 <span>Total</span>
-                <span className="text-[#1a6b3a]">€{fmt(totalPrice + shipping)}</span>
+                <span className="text-[#1a6b3a]">₹{fmt(totalPrice + shipping)}</span>
               </div>
             </div>
 

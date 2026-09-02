@@ -239,7 +239,7 @@ function Cart() {
                 {/* Unit price */}
                 <div className="col-span-4 md:col-span-2 text-center">
                   <span className="text-xs text-gray-400 md:hidden block mb-0.5">Price</span>
-                  <span className="text-sm font-medium">€{fmt(item.price)}</span>
+                  <span className="text-sm font-medium">₹{fmt(item.price)}</span>
                 </div>
 
                 {/* Quantity */}
@@ -264,7 +264,7 @@ function Cart() {
                 {/* Line total */}
                 <div className="col-span-4 md:col-span-2 text-right">
                   <span className="text-xs text-gray-400 md:hidden block mb-0.5">Total</span>
-                  <span className="text-sm font-bold text-[#1a6b3a]">€{fmt(item.price * item.quantity)}</span>
+                  <span className="text-sm font-bold text-[#1a6b3a]">₹{fmt(item.price * item.quantity)}</span>
                 </div>
               </div>
             );
@@ -289,24 +289,24 @@ function Cart() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal ({itemCount} items)</span>
-                <span>€{fmt(totalPrice)}</span>
+                <span>₹{fmt(totalPrice)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Shipping</span>
                 <span className={shipping === 0 ? "text-[#1a6b3a] font-semibold" : ""}>
-                  {shipping === 0 ? "Free" : `€${fmt(shipping)}`}
+                  {shipping === 0 ? "Free" : `₹${fmt(shipping)}`}
                 </span>
               </div>
               {shipping > 0 && (
                 <p className="text-xs text-gray-400">
-                  Add €{fmt(50 - totalPrice)} more for free shipping
+                  Add ₹{fmt(50 - totalPrice)} more for free shipping
                 </p>
               )}
             </div>
 
             <div className="border-t border-gray-200 mt-5 pt-5 flex justify-between font-bold text-base">
               <span>Total</span>
-              <span className="text-[#1a6b3a] text-lg">€{fmt(grandTotal)}</span>
+              <span className="text-[#1a6b3a] text-lg">₹{fmt(grandTotal)}</span>
             </div>
 
             {/* Coupon */}

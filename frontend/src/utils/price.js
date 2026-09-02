@@ -1,4 +1,4 @@
-/** Parses any price value (number, "€26,95", "€26.95") → raw float */
+/** Parses any price value (number, "₹26,95", "₹26.95") → raw float */
 export function parsePrice(price) {
 
   if (typeof price === "number") return price;

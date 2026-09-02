@@ -54,7 +54,7 @@ function SummaryItem({ item }) {
         <p className="text-xs text-gray-400 mt-0.5">{item.author}</p>
       </div>
       <span className="text-sm font-semibold text-gray-800 whitespace-nowrap">
-        €{fmt(item.price * item.quantity)}
+        ₹{fmt(item.price * item.quantity)}
       </span>
     </div>
   );
@@ -273,19 +273,19 @@ function Checkout() {
           <div className="border-t border-gray-200 pt-4 space-y-2.5">
             <div className="flex justify-between text-sm text-gray-500">
               <span>Subtotal</span>
-              <span>€{fmt(totalPrice)}</span>
+              <span>₹{fmt(totalPrice)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
               <span>Shipping</span>
               <span className="text-gray-400">
-                {shipping === 0 ? <span className="text-[#1a6b3a] font-semibold">Free</span> : `€${fmt(shipping)}`}
+                {shipping === 0 ? <span className="text-[#1a6b3a] font-semibold">Free</span> : `₹${fmt(shipping)}`}
               </span>
             </div>
             <div className="flex justify-between items-center pt-3 border-t border-gray-200">
               <span className="font-bold text-gray-900">Total</span>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-xs text-gray-400 font-normal">EUR</span>
-                <span className="text-lg font-bold text-gray-900">€{fmt(totalPrice + shipping)}</span>
+                <span className="text-xs text-gray-400 font-normal">INR</span>
+                <span className="text-lg font-bold text-gray-900">₹{fmt(totalPrice + shipping)}</span>
               </div>
             </div>
           </div>

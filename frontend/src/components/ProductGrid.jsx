@@ -60,7 +60,7 @@ function ProductGrid({ products, loading }) {
               author: product.author,
               image: product.image,
               rating: product.rating,
-              price: `€${Number(product.price).toFixed(2)}`,
+              price: `₹${Number(product.price).toFixed(2)}`,
             }}
             isWishlisted={isWishlisted(product._id)}
             onToggleWishlist={toggleWishlist}

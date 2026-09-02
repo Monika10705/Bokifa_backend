@@ -53,7 +53,7 @@ function CategoryProductsPanel({ category, fetchCategoryProducts, onAddProduct }
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-800 truncate">{product.title}</p>
-                <p className="text-xs text-gray-400">{product.author} · €{product.price}</p>
+                <p className="text-xs text-gray-400">{product.author} · ₹{product.price}</p>
               </div>
               <span
                 className={`text-xs px-2 py-0.5 rounded font-medium shrink-0 ${

@@ -7,7 +7,7 @@ import CartSidebar from "./components/CartSidebar";
 import WishlistSidebar from "./components/WishlistSidebar";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminPage from "./pages/AdminPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
@@ -37,7 +37,7 @@ function App() {
                         path="/admin"
                         element={
                             <ProtectedRoute adminOnly>
-                                <AdminDashboard />
+                                <AdminPage />
                             </ProtectedRoute>
                         }
                     />

@@ -58,7 +58,7 @@ function Header() {
         {/* Right controls */}
         <div className="flex items-center gap-5 text-sm text-gray-700 shrink-0">
           <button className="cursor-pointer hidden lg:flex items-center gap-1 hover:text-[#0d3b2e]">
-            EUR € <ChevronDown size={14} />
+            INR ₹ <ChevronDown size={14} />
           </button>
           <span className="hidden lg:block text-gray-300">|</span>
           <button className="cursor-pointer hidden lg:flex items-center gap-1 hover:text-[#0d3b2e]">
