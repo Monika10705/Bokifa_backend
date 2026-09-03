@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { FiChevronDown, FiChevronRight, FiSearch } from "react-icons/fi";
 import Button from "../Button";
 import CategoryProductsPanel from "./CategoryProductsPanel";
 
@@ -34,7 +35,7 @@ function CategoriesTable({ categories, onAdd, onEdit, onDelete, fetchCategoryPro
               onChange={(event) => setSearch(event.target.value)}
               className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
             />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
           </div>
           <Button onClick={onAdd} className="!w-auto px-4 !py-2 text-sm !font-medium">
             + Add Category
@@ -72,7 +73,7 @@ function CategoriesTable({ categories, onAdd, onEdit, onDelete, fetchCategoryPro
                   className="text-gray-400 hover:text-gray-600 transition text-sm shrink-0 w-5"
                   title={isExpanded ? "Collapse" : "Expand"}
                 >
-                  {isExpanded ? "▾" : "▸"}
+                  {isExpanded ? <FiChevronDown /> : <FiChevronRight />}
                 </button>
 
                 {/* Category name + slug */}

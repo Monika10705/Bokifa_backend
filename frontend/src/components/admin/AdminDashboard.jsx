@@ -12,6 +12,7 @@ import {
     Bar,
     Legend,
 } from "recharts";
+import { FiArrowRight, FiBookOpen, FiDollarSign, FiShoppingCart, FiUsers } from "react-icons/fi";
 
 function AdminDashboard({onViewOrders, onViewUsers}) {
     const [dashboard, setDashboard] = useState(null);
@@ -103,22 +104,22 @@ function AdminDashboard({onViewOrders, onViewUsers}) {
         {
             title: "Total Users",
             value: stats.totalUsers,
-            icon: "👥",
+            icon: FiUsers,
         },
         {
             title: "Total Products",
             value: stats.totalProducts,
-            icon: "📚",
+            icon: FiBookOpen,
         },
         {
             title: "Total Orders",
             value: stats.totalOrders,
-            icon: "🛒",
+            icon: FiShoppingCart,
         },
         {
             title: "Total Revenue",
             value: `₹${Number(stats.totalRevenue).toFixed(2)}`,
-            icon: "💰",
+            icon: FiDollarSign,
         },
     ];
 
@@ -154,8 +155,8 @@ function AdminDashboard({onViewOrders, onViewUsers}) {
                                 </p>
                             </div>
 
-                            <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
-                                {card.icon}
+                            <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
+                                <card.icon size={24} aria-hidden="true" />
                             </div>
                         </div>
                     </div>
@@ -288,13 +289,13 @@ function AdminDashboard({onViewOrders, onViewUsers}) {
                             onClick={onViewOrders}
                             className="text-sm font-medium text-green-700 hover:text-green-800 hover:underline transition cursor-pointer"
                         >
-                            View all →
+                            View all <FiArrowRight className="inline" aria-hidden="true" />
                         </button>
                     </div>
 
                     {dashboard.recentOrders.length === 0 ? (
                         <div className="py-10 text-center">
-                            <div className="text-3xl mb-2">🛒</div>
+                            <FiShoppingCart size={30} className="mx-auto mb-2 text-gray-400" aria-hidden="true" />
 
                             <p className="text-sm font-medium text-gray-700">
                                 No orders yet
@@ -390,13 +391,13 @@ function AdminDashboard({onViewOrders, onViewUsers}) {
                             onClick={onViewUsers}
                             className="text-sm font-medium text-green-700 hover:text-green-800 hover:underline transition cursor-pointer"
                         >
-                            View all →
+                            View all <FiArrowRight className="inline" aria-hidden="true" />
                         </button>
                     </div>
 
                     {dashboard.recentUsers.length === 0 ? (
                         <div className="py-10 text-center">
-                            <div className="text-3xl mb-2">👥</div>
+                            <FiUsers size={30} className="mx-auto mb-2 text-gray-400" aria-hidden="true" />
 
                             <p className="text-sm font-medium text-gray-700">
                                 No users yet

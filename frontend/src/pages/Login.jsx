@@ -9,7 +9,6 @@ import Button from "../components/Button";
 function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        role: "user",
         email: "",
         password: "",
     });
@@ -59,25 +58,7 @@ function Login() {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
 
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="role"
-                            className="text-sm font-medium text-gray-700"
-                        >
-                            Role
-                        </label>
-
-                        <select
-                            id="role"
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600 transition"
-                        >
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
+                    
 
                     <div className="space-y-2">
                         <label

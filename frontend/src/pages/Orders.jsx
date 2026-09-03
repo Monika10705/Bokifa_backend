@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, ShoppingBag } from "lucide-react";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import api from "../services/api";
 
 const STATUS_STYLES = {
@@ -101,7 +102,7 @@ function Orders() {
                     {order.status}
                   </span>
                   <p className="text-base font-bold text-[#1a6b3a]">₹{fmt(order.total)}</p>
-                  <span className="text-gray-400 text-sm">{isExpanded ? "▲" : "▼"}</span>
+                  <span className="text-gray-400">{isExpanded ? <FiChevronUp /> : <FiChevronDown />}</span>
                 </div>
               </button>
 

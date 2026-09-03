@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiX } from "react-icons/fi";
 
 import { useAdminData } from "../hooks/useAdminData";
 import AdminSidebar from "../components/admin/AdminSidebar";
@@ -14,6 +15,7 @@ import Modal from "../components/Modal";
 import ProductForm from "../components/ProductForm";
 import CategoryForm from "../components/CategoryForm";
 import Button from "../components/Button";
+import Pagination from "../components/admin/Pagination";
 
 // Default empty states for the add forms
 const EMPTY_PRODUCT = { title: "", author: "", description: "", price: "", category: "", image: "", stock: "", rating: 0, isFeatured: false, isActive: true };
@@ -29,11 +31,29 @@ function AdminPage() {
   const [modal, setModal] = useState(null); // { type, data, ...extras }
 
   const {
-    products, categories, users, orders,
-    error, clearError,
-    saveProduct, deleteProduct,
-    saveCategory, deleteCategory,
-    fetchCategoryProducts, addProductToCategory,
+    products,
+    categories,
+    users,
+    orders,
+
+    productPagination,
+    categoryPagination,
+    userPagination,
+    orderPagination,
+
+    fetchProducts,
+    fetchCategories,
+    fetchUsers,
+    fetchOrders,
+
+    error,
+    clearError,
+    saveProduct,
+    deleteProduct,
+    saveCategory,
+    deleteCategory,
+    fetchCategoryProducts,
+    addProductToCategory,
     updateOrderStatus,
   } = useAdminData();
 
@@ -90,7 +110,7 @@ function AdminPage() {
       <AdminSidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        counts={counts}
+        // counts={counts}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen((prev) => !prev)}
         mobileOpen={mobileMenuOpen}
@@ -113,7 +133,7 @@ function AdminPage() {
                 onClick={clearError}
                 className="!w-auto !bg-transparent !py-0 !text-red-600 font-bold ml-2"
               >
-                ×
+                <FiX aria-label="Dismiss error" />
               </Button>
             </div>
           )}
@@ -128,51 +148,91 @@ function AdminPage() {
 
           {/* Categories tab */}
           {activeTab === "categories" && (
-            <CategoriesTable
-              categories={categories}
-              onAdd={() => openModal("category")}
-              onEdit={(category) => openModal("category", category)}
-              onDelete={deleteCategory}
-              fetchCategoryProducts={fetchCategoryProducts}
-              onAddProductToCategory={(category) =>
-                openModal("product-in-category", null, {
-                  categoryId: category._id,
-                  categoryName: category.name,
-                })
-              }
-            />
+            <>
+              <CategoriesTable
+                categories={categories}
+                onAdd={() => openModal("category")}
+                onEdit={(category) => openModal("category", category)}
+                onDelete={deleteCategory}
+                fetchCategoryProducts={fetchCategoryProducts}
+                onAddProductToCategory={(category) =>
+                  openModal("product-in-category", null, {
+                    categoryId: category._id,
+                    categoryName: category.name,
+                  })
+                }
+              />
+
+              <Pagination
+                pagination={categoryPagination}
+                onPageChange={(page) => {
+                  const offset = (page - 1) * categoryPagination.limit;
+                  fetchCategories(offset);
+                }}
+              />
+            </>
           )}
 
           {/* Products tab */}
           {activeTab === "products" && (
-            <ProductsTable
-              products={filteredProducts}
-              search={productSearch}
-              onSearch={setProductSearch}
-              onAdd={() => openModal("product")}
-              onEdit={(product) =>
-                openModal("product", {
-                  ...product,
-                  category: Array.isArray(product.category)
-                    ? product.category.join(", ")
-                    : product.category,
-                })
-              }
-              onDelete={deleteProduct}
-            />
+            <>
+              <ProductsTable
+                products={filteredProducts}
+                search={productSearch}
+                onSearch={setProductSearch}
+                onAdd={() => openModal("product")}
+                onEdit={(product) =>
+                  openModal("product", {
+                    ...product,
+                    category: Array.isArray(product.category)
+                      ? product.category.join(", ")
+                      : product.category,
+                  })
+                }
+                onDelete={deleteProduct}
+              />
+
+              <Pagination
+                pagination={productPagination}
+                onPageChange={(page) => {
+                  const offset = (page - 1) * productPagination.limit;
+                  fetchProducts(offset);
+                }}
+              />
+            </>
           )}
 
           {/* Orders tab */}
           {activeTab === "orders" && (
-            <OrdersTable
-              orders={orders}
-              onUpdateStatus={updateOrderStatus}
-            />
+            <>
+              <OrdersTable
+                orders={orders}
+                onUpdateStatus={updateOrderStatus}
+              />
+
+              <Pagination
+                pagination={orderPagination}
+                onPageChange={(page) => {
+                  const offset = (page - 1) * orderPagination.limit;
+                  fetchOrders(offset);
+                }}
+              />
+            </>
           )}
 
           {/* Users tab */}
           {activeTab === "users" && (
-            <UsersTable users={users} />
+            <>
+              <UsersTable users={users} />
+
+              <Pagination
+                pagination={userPagination}
+                onPageChange={(page) => {
+                  const offset = (page - 1) * userPagination.limit;
+                  fetchUsers(offset);
+                }}
+              />
+            </>
           )}
 
         </main>

@@ -7,10 +7,57 @@ const Order = require("../models/Order");
 // Get all users — admin can only view, not modify
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password").sort({ createdAt: -1 });
-    res.status(200).json({ success: true, users });
+    console.log("USER QUERY:", req.query);
+
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 10, 1),
+      100
+    );
+
+    const offset = Math.max(
+      Number(req.query.offset) || 0,
+      0
+    );
+
+    console.log("LIMIT:", limit);
+    console.log("OFFSET:", offset);
+
+    const [users, total] = await Promise.all([
+      User.find()
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit),
+
+      User.countDocuments(),
+    ]);
+
+    console.log("USERS RETURNED:", users.length);
+    console.log("TOTAL:", total);
+
+    const totalPages = Math.ceil(total / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+
+    res.status(200).json({
+      success: true,
+      users,
+      pagination: {
+        limit,
+        offset,
+        total,
+        totalPages,
+        currentPage,
+        hasNextPage: offset + users.length < total,
+        hasPreviousPage: offset > 0,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Get all users error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -19,12 +66,68 @@ const getAllUsers = async (req, res) => {
 // Get all orders from all users, with user details populated
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
-    res.status(200).json({ success: true, orders });
+    console.log("ORDER QUERY:", req.query);
+
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 10, 1),
+      100
+    );
+
+    const offset = Math.max(
+      Number(req.query.offset) || 0,
+      0
+    );
+
+    const { status } = req.query;
+
+    console.log("LIMIT:", limit);
+    console.log("OFFSET:", offset);
+    console.log("STATUS:", status || "all");
+
+    // Build filter
+    const filter = {};
+
+    if (status) {
+      filter.status = status;
+    }
+
+    const [orders, total] = await Promise.all([
+      Order.find(filter)
+        .populate("user", "name email")
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit),
+
+      Order.countDocuments(filter),
+    ]);
+
+    console.log("ORDERS RETURNED:", orders.length);
+    console.log("TOTAL:", total);
+
+    const totalPages = Math.ceil(total / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+
+    res.status(200).json({
+      success: true,
+      orders,
+      pagination: {
+        limit,
+        offset,
+        status,
+        total,
+        totalPages,
+        currentPage,
+        hasNextPage: offset + orders.length < total,
+        hasPreviousPage: offset > 0,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Get all orders error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -67,19 +170,124 @@ const updateOrderStatus = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, products });
+    console.log("PRODUCT QUERY:", req.query);
+
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 10, 1),
+      100
+    );
+
+    const offset = Math.max(
+      Number(req.query.offset) || 0,
+      0
+    );
+
+    console.log("LIMIT:", limit);
+    console.log("OFFSET:", offset);
+
+    const [products, total] = await Promise.all([
+      Product.find()
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit),
+
+      Product.countDocuments(),
+    ]);
+
+    console.log("PRODUCTS RETURNED:", products.length);
+    console.log("TOTAL:", total);
+
+    const totalPages = Math.ceil(total / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+
+    res.status(200).json({
+      success: true,
+      products,
+      pagination: {
+        limit,
+        offset,
+        total,
+        totalPages,
+        currentPage,
+        hasNextPage: offset + products.length < total,
+        hasPreviousPage: offset > 0,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Get all products error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ name: 1 });
-    res.status(200).json({ success: true, categories });
+    console.log("CATEGORY QUERY:", req.query);
+
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 10, 1),
+      100
+    );
+
+    const offset = Math.max(
+      Number(req.query.offset) || 0,
+      0
+    );
+
+    const { search = "" } = req.query;
+
+    console.log("LIMIT:", limit);
+    console.log("OFFSET:", offset);
+    console.log("SEARCH:", search || "all");
+
+    // Build filter
+    const filter = {};
+
+    if (search.trim()) {
+      filter.name = {
+        $regex: search.trim(),
+        $options: "i",
+      };
+    }
+
+    const [categories, total] = await Promise.all([
+      Category.find(filter)
+        .sort({ name: 1 })
+        .skip(offset)
+        .limit(limit),
+
+      Category.countDocuments(filter),
+    ]);
+
+    console.log("CATEGORIES RETURNED:", categories.length);
+    console.log("TOTAL:", total);
+
+    const totalPages = Math.ceil(total / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+
+    res.status(200).json({
+      success: true,
+      categories,
+      pagination: {
+        limit,
+        offset,
+        total,
+        totalPages,
+        currentPage,
+        hasNextPage: offset + categories.length < total,
+        hasPreviousPage: offset > 0,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Get all categories error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

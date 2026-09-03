@@ -12,58 +12,104 @@ export function useAdminData() {
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
+  const [productPagination, setProductPagination] = useState({});
+  const [categoryPagination, setCategoryPagination] = useState({});
+  const [userPagination, setUserPagination] = useState({});
+  const [orderPagination, setOrderPagination] = useState({});
+  const LIMIT = 5;
 
   const clearError = () => setError("");
 
   // ── Fetch all data on mount ────────────────────────────────────────────────
-
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (offset = 0) => {
     try {
-      const res = await api.get("/admin/products", authHeader());
+      const res = await api.get(
+        `/admin/products?limit=${LIMIT}&offset=${offset}`,
+        authHeader(),
+      );
+
       setProducts(res.data.products);
+      setProductPagination(res.data.pagination);
     } catch {
       setError("Failed to load products.");
     }
   }, []);
 
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (offset = 0, search = "") => {
     try {
-      // Sync first: creates Category documents for any product category
-      // strings that don't have one yet, then returns the full list.
-      const res = await api.post("/admin/categories/sync", {}, authHeader());
+      // Sync first so category data stays consistent with products
+      await api.post("/admin/categories/sync", {}, authHeader());
+
+      const params = new URLSearchParams({
+        limit: LIMIT,
+        offset,
+      });
+
+      if (search.trim()) {
+        params.append("search", search.trim());
+      }
+
+      const res = await api.get(
+        `/admin/categories?${params.toString()}`,
+        authHeader(),
+      );
+
       setCategories(res.data.categories);
+      setCategoryPagination(res.data.pagination);
     } catch {
       setError("Failed to load categories.");
     }
   }, []);
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (offset = 0) => {
+    console.log("FETCH USERS OFFSET:", offset);
+
     try {
-      const res = await api.get("/admin/users", authHeader());
+      const res = await api.get(
+        `/admin/users?limit=${LIMIT}&offset=${offset}`,
+        authHeader(),
+      );
+
       setUsers(res.data.users);
+      setUserPagination(res.data.pagination);
     } catch {
       setError("Failed to load users.");
     }
   }, []);
 
-  const fetchOrders = useCallback(async () => {
+  const fetchOrders = useCallback(async (offset = 0, status = "") => {
     try {
-      const res = await api.get("/admin/orders", authHeader());
+      const params = new URLSearchParams({
+        limit: LIMIT,
+        offset,
+      });
+
+      if (status) {
+        params.append("status", status);
+      }
+
+      const res = await api.get(
+        `/admin/orders?${params.toString()}`,
+        authHeader(),
+      );
+
       setOrders(res.data.orders);
+      setOrderPagination(res.data.pagination);
     } catch {
       setError("Failed to load orders.");
     }
   }, []);
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-    fetchUsers();
-    fetchOrders();
+    queueMicrotask(() => {
+      fetchProducts();
+      fetchCategories();
+      fetchUsers();
+      fetchOrders();
+    });
   }, [fetchProducts, fetchCategories, fetchUsers, fetchOrders]);
 
   // ── Products ───────────────────────────────────────────────────────────────
-
   const saveProduct = async (form) => {
     try {
       const payload = {
@@ -101,7 +147,6 @@ export function useAdminData() {
   };
 
   // ── Categories ─────────────────────────────────────────────────────────────
-
   const saveCategory = async (form) => {
     try {
       if (form._id) {
@@ -110,8 +155,8 @@ export function useAdminData() {
         await api.post("/admin/categories", form, authHeader());
       }
       // Re-sync so the list stays consistent after save
-      const res = await api.post("/admin/categories/sync", {}, authHeader());
-      setCategories(res.data.categories);
+      await api.post("/admin/categories/sync", {}, authHeader());
+      fetchCategories();
     } catch (e) {
       setError(e.response?.data?.message || "Error saving category.");
       throw e;
@@ -127,9 +172,7 @@ export function useAdminData() {
       setError("Failed to delete category.");
     }
   };
-
   // ── Category <-> Products ──────────────────────────────────────────────────
-
   const fetchCategoryProducts = useCallback(async (categoryId) => {
     try {
       const res = await api.get(
@@ -184,6 +227,14 @@ export function useAdminData() {
     users,
     orders,
     error,
+    productPagination,
+    categoryPagination,
+    userPagination,
+    orderPagination,
+    fetchUsers,
+    fetchProducts,
+    fetchOrders,
+    fetchCategories,
     clearError,
     saveProduct,
     deleteProduct,

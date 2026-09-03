@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { FiSearch, FiStar } from "react-icons/fi";
 import { Section, EmptyRow, RowActions } from "./AdminTableHelpers";
 
 function ProductsTable({ products, search, onSearch, onAdd, onEdit, onDelete }) {
@@ -30,7 +31,7 @@ function ProductsTable({ products, search, onSearch, onAdd, onEdit, onDelete }) 
             onChange={(event) => onSearch(event.target.value)}
             className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
         </div>
       )}
     >
@@ -110,7 +111,7 @@ function ProductsTable({ products, search, onSearch, onAdd, onEdit, onDelete }) 
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     {product.isFeatured
-                      ? <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">★ Yes</span>
+                      ? <span className="inline-flex items-center gap-1 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded"><FiStar aria-hidden="true" /> Yes</span>
                       : <span className="text-gray-400">—</span>
                     }
                   </td>

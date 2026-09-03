@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { FiPlus } from "react-icons/fi";
 import heroBg from '../assets/hero-book.png';
 import React from "react";
 
@@ -75,7 +76,7 @@ function HeroSection() {
                   <span className="text-[#0d3b2e] font-bold">{num}</span>{" "}
                   {label}
                 </span>
-                {i < 3 && <span className="text-amber-400">✽</span>}
+                {i < 3 && <FiPlus className="text-amber-400" aria-hidden="true" />}
               </React.Fragment>
             ))}
           </div>

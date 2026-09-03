@@ -1,14 +1,24 @@
 import Button from "../Button";
+import {
+  FiBarChart2,
+  FiChevronLeft,
+  FiChevronRight,
+  FiPackage,
+  FiShoppingBag,
+  FiTag,
+  FiUsers,
+  FiX,
+} from "react-icons/fi";
 
 const NAV_ITEMS = [
-  { key: "dashboard",  label: "Dashboard",  icon: "📊" },
-  { key: "categories", label: "Categories", icon: "🏷️" },
-  { key: "products",   label: "Products",   icon: "📦" },
-  { key: "orders",     label: "Orders",     icon: "🧾" },
-  { key: "users",      label: "Users",      icon: "👥" },
+  { key: "dashboard",  label: "Dashboard",  icon: FiBarChart2 },
+  { key: "categories", label: "Categories", icon: FiTag },
+  { key: "products",   label: "Products",   icon: FiPackage },
+  { key: "orders",     label: "Orders",     icon: FiShoppingBag },
+  { key: "users",      label: "Users",      icon: FiUsers },
 ];
 
-function AdminSidebar({ activeTab, onTabChange, counts, isOpen, onToggle, mobileOpen, onMobileClose }) {
+function AdminSidebar({ activeTab, onTabChange, isOpen, onToggle, mobileOpen, onMobileClose }) {
   return (
     <>
       {/* Mobile backdrop */}
@@ -37,9 +47,10 @@ function AdminSidebar({ activeTab, onTabChange, counts, isOpen, onToggle, mobile
           {/* Close button — mobile only */}
           <button
             onClick={onMobileClose}
-            className="lg:hidden text-gray-400 hover:text-gray-600 text-xl leading-none cursor-pointer"
+            aria-label="Close navigation"
+            className="lg:hidden text-gray-400 hover:text-gray-600 cursor-pointer"
           >
-            ×
+            <FiX size={22} />
           </button>
         </div>
 
@@ -55,15 +66,15 @@ function AdminSidebar({ activeTab, onTabChange, counts, isOpen, onToggle, mobile
                   : "!bg-transparent !text-gray-600 hover:!bg-gray-100"
                 }`}
             >
-              <span className="text-base shrink-0">{item.icon}</span>
+              <item.icon className="text-base shrink-0" aria-hidden="true" />
               <span className={`flex-1 text-left lg:${isOpen ? "block" : "hidden"}`}>
                 {item.label}
               </span>
-              {counts[item.key] !== undefined && (
+              {/* {counts[item.key] !== undefined && (
                 <span className={`text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full lg:${isOpen ? "inline" : "hidden"}`}>
                   {counts[item.key]}
                 </span>
-              )}
+              )} */}
             </Button>
           ))}
         </nav>
@@ -73,7 +84,7 @@ function AdminSidebar({ activeTab, onTabChange, counts, isOpen, onToggle, mobile
           onClick={onToggle}
           className="hidden lg:flex mx-2 mb-4 !w-auto items-center justify-center gap-2 px-3 !py-2 !rounded-lg text-xs !text-gray-400 !bg-transparent hover:!bg-gray-100 transition"
         >
-          {isOpen ? "◀ Collapse" : "▶"}
+          {isOpen ? <><FiChevronLeft /> Collapse</> : <FiChevronRight />}
         </Button>
       </aside>
     </>

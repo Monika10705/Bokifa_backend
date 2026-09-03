@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { FiSearch } from "react-icons/fi";
 import { EmptyRow } from "./AdminTableHelpers";
 
 function UsersTable({ users }) {
@@ -27,7 +28,7 @@ function UsersTable({ users }) {
               onChange={(event) => setSearch(event.target.value)}
               className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
             />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
           </div>
           <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Read-only</span>
         </div>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { FiChevronDown, FiChevronRight, FiChevronUp, FiSearch } from "react-icons/fi";
 import { EmptyRow, StatusBadge } from "./AdminTableHelpers";
 
 const ALL_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
@@ -43,7 +44,7 @@ function OrdersTable({ orders, onUpdateStatus }) {
             onChange={(event) => setSearch(event.target.value)}
             className="w-full border border-gray-200 rounded-lg px-4 py-2 pl-9 text-sm outline-none focus:ring-2 focus:ring-green-500"
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
         </div>
       </div>
 
@@ -77,7 +78,7 @@ function OrdersTable({ orders, onUpdateStatus }) {
                   <div className="text-right space-y-1 shrink-0">
                     <p className="text-sm font-bold text-gray-800">₹{formatPrice(order.total)}</p>
                     <StatusBadge status={order.status} />
-                    <p className="text-gray-400 text-xs">{isExpanded ? "▲" : "▼"}</p>
+                    <span className="flex justify-end text-gray-400">{isExpanded ? <FiChevronUp /> : <FiChevronDown />}</span>
                   </div>
                 </button>
 
@@ -152,7 +153,7 @@ function OrdersTable({ orders, onUpdateStatus }) {
                             onClick={() => toggleExpand(order._id)}
                             className="font-mono text-xs text-green-700 hover:underline cursor-pointer flex items-center gap-1"
                           >
-                            {isExpanded ? "▾" : "▸"}
+                            {isExpanded ? <FiChevronDown /> : <FiChevronRight />}
                             #{order._id.slice(-8).toUpperCase()}
                           </button>
                         </td>

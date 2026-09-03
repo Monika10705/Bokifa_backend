@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import { FiArrowLeft } from "react-icons/fi";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -84,7 +85,7 @@ const ForgotPassword = () => {
             to="/login"
             className="text-[#1a6b3a] font-medium hover:underline"
           >
-            ← Back to Login
+            <FiArrowLeft className="inline mr-1" aria-hidden="true" /> Back to Login
           </Link>
         </div>
 
